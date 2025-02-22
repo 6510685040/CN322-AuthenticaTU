@@ -14,7 +14,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   MobileScannerController cameraController = MobileScannerController();
   bool _isProcessing = false; // Prevents multiple scans
 
-  void _processQRCode(String code) {
+  void _processQRCode(String code) async {
     if (_isProcessing) return; // Ignore additional scans
     _isProcessing = true; // Mark processing started
 
@@ -29,20 +29,22 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         if (secret != null && label != null) {
           TOTPKey totpKey = TOTPKey(key: secret, label: label, issuer: issuer);
           var provider = Provider.of<OtpProvider>(context, listen: false);
-          provider.addKey(totpKey);
-
-          // Stop camera before navigating
-          cameraController.stop();
-
-          // Navigate back to HomeScreen
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return HomeScreen();
-              },
-            ),
-          );
+          await provider.addKey(totpKey).then((isSuccess) {
+            if (isSuccess) {
+              cameraController.stop();
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text("Key added successfully")));
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            } else {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text("Key already exists!")));
+            }
+          });
         } else {
           _showError("Invalid QR code");
         }

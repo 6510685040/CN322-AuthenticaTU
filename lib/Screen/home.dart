@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:authenticatu/Screen/scanner.dart';
+import 'package:authenticatu/components/countdownbar.dart';
 import 'package:authenticatu/providers/otp_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,11 +11,35 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Timer? _timer;
+
+  void _startOtpTimer() {
+    final now = DateTime.now();
+    int secondsUntilNextCycle = 30 - (now.second % 30);
+
+    Future.delayed(Duration(seconds: secondsUntilNextCycle), () {
+      reloadData();
+      _timer = Timer.periodic(Duration(seconds: 30), (timer) {
+        reloadData();
+      });
+    });
+  }
+
+  void reloadData() {
+    Provider.of<OtpProvider>(context, listen: false).initData();
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    Provider.of<OtpProvider>(context, listen: false).initData();
+    reloadData();
+    _startOtpTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -27,18 +53,25 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text("ไม่พบข้อมูล", style: TextStyle(fontSize: 35)),
             );
           } else {
-            return ListView.builder(
-              itemCount: itemCount,
-              itemBuilder: (context, index) {
-                final otp = provider.otps[index];
-                return Card(
-                  child: ListTile(
-                    leading: Text(otp.key),
-                    title: Text(otp.label),
-                    subtitle: Text(otp.issuer ?? ""),
+            return Column(
+              children: [
+                TOTPCountdownBar(),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: itemCount,
+                    itemBuilder: (context, index) {
+                      final otp = provider.otps[index];
+                      return Card(
+                        child: ListTile(
+                          leading: Text(otp.key),
+                          title: Text(otp.label),
+                          subtitle: Text(otp.issuer ?? ""),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ],
             );
           }
         },
