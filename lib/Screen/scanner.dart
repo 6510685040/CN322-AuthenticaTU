@@ -3,7 +3,6 @@ import 'package:authenticatu/models/keys.dart';
 import 'package:authenticatu/providers/otp_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:otp/otp.dart';
 import 'package:provider/provider.dart';
 
 class QRScannerScreen extends StatefulWidget {
@@ -13,8 +12,12 @@ class QRScannerScreen extends StatefulWidget {
 
 class _QRScannerScreenState extends State<QRScannerScreen> {
   MobileScannerController cameraController = MobileScannerController();
+  bool _isProcessing = false; // Prevents multiple scans
 
   void _processQRCode(String code) {
+    if (_isProcessing) return; // Ignore additional scans
+    _isProcessing = true; // Mark processing started
+
     try {
       Uri uri = Uri.parse(code);
       if (uri.scheme == 'otpauth' && uri.host == 'totp') {
@@ -24,12 +27,14 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
             uri.pathSegments.isNotEmpty ? uri.pathSegments.last : null;
 
         if (secret != null && label != null) {
-          print(
-            "######################################################################object$label,$issuer,$secret",
-          );
           TOTPKey totpKey = TOTPKey(key: secret, label: label, issuer: issuer);
           var provider = Provider.of<OtpProvider>(context, listen: false);
           provider.addKey(totpKey);
+
+          // Stop camera before navigating
+          cameraController.stop();
+
+          // Navigate back to HomeScreen
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -46,6 +51,10 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       }
     } catch (e) {
       _showError("Failed to parse QR code");
+    } finally {
+      Future.delayed(Duration(seconds: 2), () {
+        _isProcessing = false; // Allow scanning again after 2 seconds
+      });
     }
   }
 
@@ -53,6 +62,9 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+    Future.delayed(Duration(seconds: 2), () {
+      _isProcessing = false; // Reset scanning flag after error
+    });
   }
 
   @override
@@ -62,6 +74,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
       body: MobileScanner(
         controller: cameraController,
         onDetect: (capture) {
+          if (_isProcessing) return; // Prevent multiple scans
           final List<Barcode> barcodes = capture.barcodes;
           if (barcodes.isNotEmpty) {
             _processQRCode(barcodes.first.rawValue ?? "");
