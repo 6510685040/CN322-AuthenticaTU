@@ -2,6 +2,8 @@ import 'package:authenticatu/Screen/login.dart';
 import 'package:flutter/material.dart';
 
 class SignUpScreen extends StatelessWidget {
+  const SignUpScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -15,7 +17,6 @@ class SignUpScreen extends StatelessWidget {
           height: screenHeight,
           child: Stack(
             children: [
-      
               Positioned(
                 top: screenHeight * 0.20,
                 left: screenWidth * 0.20,
@@ -40,7 +41,7 @@ class SignUpScreen extends StatelessWidget {
                 ),
               ),
 
-            Positioned(
+              Positioned(
                 top: screenHeight * 0.27,
                 left: screenWidth * 0.23,
                 child: Text(
@@ -157,10 +158,9 @@ class SignUpScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        
                       ),
                       SizedBox(height: screenHeight * 0.04),
-                
+
                       // Sign Up Button
                       Padding(
                         padding: EdgeInsets.symmetric(
@@ -169,14 +169,13 @@ class SignUpScreen extends StatelessWidget {
                         child: SizedBox(
                           width: screenWidth * 0.70,
                           height: screenHeight * 0.05,
-    
+
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               backgroundColor: Color(0xFFFFEB00),
                               side: BorderSide(color: Color(0xFFD9D9D9)),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                
                               ),
                             ),
                             onPressed: () {
@@ -188,7 +187,6 @@ class SignUpScreen extends StatelessWidget {
                               );
                             },
                             child: Text(
-      
                               'Sign Up',
                               style: TextStyle(
                                 fontFamily: 'Geist',
@@ -207,7 +205,7 @@ class SignUpScreen extends StatelessWidget {
             ],
           ),
         ),
-        ),
+      ),
     );
   }
 }

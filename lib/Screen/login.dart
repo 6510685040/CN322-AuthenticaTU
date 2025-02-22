@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:authenticatu/Screen/signup.dart';
 
 class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -15,7 +17,6 @@ class LoginScreen extends StatelessWidget {
           height: screenHeight,
           child: Stack(
             children: [
-            
               Positioned(
                 top: screenHeight * 0.20,
                 left: screenWidth * 0.20,
