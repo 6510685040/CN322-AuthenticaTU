@@ -6,27 +6,62 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   Timer? _timer;
+  bool _isLoading = true;
+  String? _error;
 
   void _startOtpTimer() {
     final now = DateTime.now();
-    int secondsUntilNextCycle = 30 - (now.second % 30);
+    final secondsUntilNextCycle = 30 - (now.second % 30);
 
+    // Initial delay to sync with 30-second intervals
     Future.delayed(Duration(seconds: secondsUntilNextCycle), () {
-      reloadData();
-      _timer = Timer.periodic(Duration(seconds: 30), (timer) {
+      if (mounted) {
         reloadData();
-      });
+        _timer = Timer.periodic(const Duration(seconds: 30), (_) {
+          reloadData();
+        });
+      }
     });
   }
 
-  void reloadData() {
-    Provider.of<OtpProvider>(context, listen: false).initData();
+  Future<void> reloadData() async {
+    if (!mounted) return;
+
+    setState(() {
+      _error = null;
+    });
+
+    try {
+      Provider.of<OtpProvider>(context, listen: false).initData();
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = 'Failed to load OTP data. Please try again.';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleRefresh() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    await reloadData();
   }
 
   @override
@@ -45,46 +80,115 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<OtpProvider>(
-        builder: (context, provider, child) {
-          int itemCount = provider.otps.length;
-          if (itemCount <= 0) {
-            return Center(
-              child: Text("ไม่พบข้อมูล", style: TextStyle(fontSize: 35)),
-            );
-          } else {
-            return Column(
-              children: [
-                TOTPCountdownBar(),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: itemCount,
-                    itemBuilder: (context, index) {
-                      final otp = provider.otps[index];
-                      return Card(
-                        child: ListTile(
-                          leading: Text(otp.key),
-                          title: Text(otp.label),
-                          subtitle: Text(otp.issuer ?? ""),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          }
-        },
+      appBar: AppBar(
+        title: const Text('Authenticator'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _isLoading ? null : _handleRefresh,
+          ),
+        ],
       ),
+      body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => QRScannerScreen()),
-          );
+          ).then(
+            (_) => reloadData(),
+          ); // Reload data after returning from scanner
         },
-        child: Icon(Icons.qr_code_scanner),
+        child: const Icon(Icons.qr_code_scanner),
       ),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(_error!, style: const TextStyle(color: Colors.red)),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _handleRefresh,
+              child: const Text('Try Again'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Consumer<OtpProvider>(
+      builder: (context, provider, child) {
+        final itemCount = provider.otps.length;
+
+        if (itemCount <= 0) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("ไม่พบข้อมูล", style: TextStyle(fontSize: 35)),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QRScannerScreen(),
+                      ),
+                    ).then((_) => reloadData());
+                  },
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: const Text('Scan QR Code'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: _handleRefresh,
+          child: Column(
+            children: [
+              TOTPCountdownBar(),
+              Expanded(
+                child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: itemCount,
+                  itemBuilder: (context, index) {
+                    final otp = provider.otps[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      child: ListTile(
+                        leading: Text(
+                          otp.key,
+                          style: const TextStyle(
+                            fontFamily: 'Monospace',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        title: Text(otp.label),
+                        subtitle: otp.issuer != null ? Text(otp.issuer!) : null,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

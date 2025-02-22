@@ -30,19 +30,25 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
           TOTPKey totpKey = TOTPKey(key: secret, label: label, issuer: issuer);
           var provider = Provider.of<OtpProvider>(context, listen: false);
           await provider.addKey(totpKey).then((isSuccess) {
-            if (isSuccess) {
-              cameraController.stop();
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text("Key added successfully")));
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
-              );
+            if (isSuccess != null) {
+              if (isSuccess) {
+                cameraController.stop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Key added successfully")),
+                );
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
+              } else {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text("Key already exists!")));
+              }
             } else {
               ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(SnackBar(content: Text("Key already exists!")));
+              ).showSnackBar(SnackBar(content: Text("Error")));
             }
           });
         } else {

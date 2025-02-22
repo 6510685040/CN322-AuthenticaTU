@@ -7,55 +7,68 @@ import 'package:otp/otp.dart';
 class OtpProvider with ChangeNotifier {
   List<Otps> otps = [];
 
-  void initData() async {
-    var db = TOTPDB.instance;
-    _makeOtps(await db.loadAllData());
-    notifyListeners();
-  }
-
-  Future<bool> addKey(TOTPKey key) async {
-    var db = TOTPDB.instance;
-    List<TOTPKey> data = await db.loadAllData();
-
-    bool isSuccess = true;
-    bool keyExists = data.any(
-      (data) =>
-          data.key == key.key &&
-          data.label == key.label &&
-          data.issuer == key.issuer,
-    );
-    if (keyExists) {
-      isSuccess = false;
-    } else {
-      await db.insertData(key);
+  Future<void> initData() async {
+    try {
+      final db = TOTPDB.instance;
+      final data = await db.loadAllData();
+      _makeOtps(data);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error initializing OTP data: $e');
     }
-    _makeOtps(data);
-    notifyListeners();
-    return isSuccess;
   }
 
-  List<Otps> getOtps() {
-    return otps;
+  Future<bool?> addKey(TOTPKey key) async {
+    try {
+      final db = TOTPDB.instance;
+      final data = await db.loadAllData();
+
+      // Check if key already exists
+      if (data.any(
+        (existing) =>
+            existing.key == key.key &&
+            existing.label == key.label &&
+            existing.issuer == key.issuer,
+      )) {
+        return false;
+      }
+
+      await db.insertData(key);
+      await initData(); // Reload data after insertion
+      return true;
+    } catch (e) {
+      debugPrint('Error adding key: $e');
+      return null;
+    }
   }
+
+  List<Otps> getOtps() => List.unmodifiable(otps);
 
   void _makeOtps(List<TOTPKey> keyList) {
     otps =
-        keyList.map((key) {
-          return Otps(
-            key: generateTOTP(key.key),
-            label: key.label,
-            issuer: key.issuer,
-          );
-        }).toList();
+        keyList
+            .map(
+              (key) => Otps(
+                key: generateTOTP(key.key),
+                label: key.label,
+                issuer: key.issuer,
+              ),
+            )
+            .toList();
   }
 
   String generateTOTP(String key) {
-    return OTP.generateTOTPCodeString(
-      key, // Secret key
-      DateTime.now().millisecondsSinceEpoch, // Current time
-      interval: 30, // Default is 30 seconds per OTP cycle
-      length: 6, // OTP length (default 6 digits)
-      algorithm: Algorithm.SHA1, // Default algorithm
-    );
+    try {
+      return OTP.generateTOTPCodeString(
+        key,
+        DateTime.now().millisecondsSinceEpoch,
+        interval: 30,
+        length: 6,
+        algorithm: Algorithm.SHA1,
+      );
+    } catch (e) {
+      debugPrint('Error generating TOTP: $e');
+      return '------';
+    }
   }
 }
