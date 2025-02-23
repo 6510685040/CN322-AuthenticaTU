@@ -14,6 +14,7 @@ class OtpProvider with ChangeNotifier {
       _makeOtps(data);
       notifyListeners();
     } catch (e) {
+      //loadAllData ไม่ error เพราะมี error handler และส่ง [] มา
       debugPrint('Error initializing OTP data: $e');
     }
   }
@@ -42,6 +43,7 @@ class OtpProvider with ChangeNotifier {
     }
   }
 
+  //ยังไม่ได้ใช้แต่อาจจะใช้แทนการเรียก instance ตรงๆ
   List<Otps> getOtps() => List.unmodifiable(otps);
 
   void _makeOtps(List<TOTPKey> keyList) {
