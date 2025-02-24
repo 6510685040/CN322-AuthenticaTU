@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
-      Provider.of<OtpProvider>(context, listen: false).initData();
+      await Provider.of<OtpProvider>(context, listen: false).initData();
     } catch (e) {
       // เป็นไปได้ยากที่จะเข้าตรงนี้เพราะ process ด้านบนมี error handle Tui
       if (mounted) {

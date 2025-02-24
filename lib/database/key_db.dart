@@ -21,7 +21,11 @@ class TOTPDB {
   static final TOTPDB instance = TOTPDB._();
 
   TOTPDB._() {
-    _initializeEncryption();
+    // _initializeEncryption();
+  }
+
+  static Future<void> initialize() async {
+    await instance._initializeEncryption();
   }
 
   Future<void> _initializeEncryption() async {
