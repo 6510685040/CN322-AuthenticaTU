@@ -114,10 +114,11 @@ class TOTPDB {
     try {
       return OTP.generateTOTPCodeString(
         _decryptValue(key),
-        DateTime.now().millisecondsSinceEpoch,
+        DateTime.now().toUtc().millisecondsSinceEpoch,
         interval: 30,
         length: 6,
         algorithm: Algorithm.SHA1,
+        isGoogle: true,
       );
     } catch (e) {
       // print('Error generating TOTP: $e');
