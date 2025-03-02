@@ -2,7 +2,6 @@ import 'package:authenticatu/database/key_db.dart';
 import 'package:authenticatu/models/keys.dart';
 import 'package:authenticatu/models/otps.dart';
 import 'package:flutter/foundation.dart';
-import 'package:otp/otp.dart';
 
 class OtpProvider with ChangeNotifier {
   List<Otps> otps = [];
@@ -51,26 +50,11 @@ class OtpProvider with ChangeNotifier {
         keyList
             .map(
               (key) => Otps(
-                key: generateTOTP(key.key),
+                key: TOTPDB.instance.generateTOTP(key.key),
                 label: key.label,
                 issuer: key.issuer,
               ),
             )
             .toList();
-  }
-
-  String generateTOTP(String key) {
-    try {
-      return OTP.generateTOTPCodeString(
-        key,
-        DateTime.now().millisecondsSinceEpoch,
-        interval: 30,
-        length: 6,
-        algorithm: Algorithm.SHA1,
-      );
-    } catch (e) {
-      debugPrint('Error generating TOTP: $e');
-      return '------';
-    }
   }
 }

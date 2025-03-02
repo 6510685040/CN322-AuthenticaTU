@@ -6,6 +6,7 @@ import 'package:sembast/sembast_io.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:authenticatu/models/keys.dart';
+import 'package:otp/otp.dart';
 
 class TOTPDB {
   static const String _dbName = "totp.db";
@@ -98,7 +99,7 @@ class TOTPDB {
       return snapshot.map((record) {
         var data = record.value as Map<String, dynamic>;
         return TOTPKey(
-          key: _decryptValue(data["key"]),
+          key: data["key"],
           label: data["label"],
           issuer: data["issuer"],
         );
@@ -106,6 +107,21 @@ class TOTPDB {
     } catch (e) {
       print('Error loading TOTP keys: $e');
       return [];
+    }
+  }
+
+  String generateTOTP(String key) {
+    try {
+      return OTP.generateTOTPCodeString(
+        _decryptValue(key),
+        DateTime.now().millisecondsSinceEpoch,
+        interval: 30,
+        length: 6,
+        algorithm: Algorithm.SHA1,
+      );
+    } catch (e) {
+      // print('Error generating TOTP: $e');
+      return '------';
     }
   }
 }
