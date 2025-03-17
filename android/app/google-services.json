@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "350277467736",
+    "project_id": "authenticatu",
+    "storage_bucket": "authenticatu.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350277467736:android:bc4db25d7b889f1d9c942d",
+        "android_client_info": {
+          "package_name": "com.example.authenticatu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-JXhd_Juu3EyL887GusyGXJf5iO-F7go"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
