@@ -1,7 +1,31 @@
+import 'package:authenticatu/Screen/auth_service.dart';
 import 'package:authenticatu/Screen/login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final TextEditingController controllerEmail = TextEditingController();
+  final TextEditingController controllerPassword = TextEditingController();
+  String errorMessage = '';
+
+  void register() async {
+    try {
+      await authService.value.createAccount(
+        email: controllerEmail.text,
+        password: controllerPassword.text,
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message ?? 'There is an error';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -15,7 +39,6 @@ class SignUpScreen extends StatelessWidget {
           height: screenHeight,
           child: Stack(
             children: [
-      
               Positioned(
                 top: screenHeight * 0.20,
                 left: screenWidth * 0.20,
@@ -40,7 +63,7 @@ class SignUpScreen extends StatelessWidget {
                 ),
               ),
 
-            Positioned(
+              Positioned(
                 top: screenHeight * 0.27,
                 left: screenWidth * 0.23,
                 child: Text(
@@ -93,8 +116,9 @@ class SignUpScreen extends StatelessWidget {
                           horizontal: screenWidth * 0.10,
                         ),
                         child: TextField(
+                          controller: controllerEmail,
                           decoration: InputDecoration(
-                            hintText: 'Enter your username',
+                            hintText: 'Enter your email',
                             hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -129,6 +153,7 @@ class SignUpScreen extends StatelessWidget {
                           horizontal: screenWidth * 0.10,
                         ),
                         child: TextField(
+                          controller: controllerPassword,
                           obscureText: true,
                           decoration: InputDecoration(
                             hintText: 'Create Your Password',
@@ -142,25 +167,30 @@ class SignUpScreen extends StatelessWidget {
                       ),
                       SizedBox(height: screenHeight * 0.02),
                       // Password Labe
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.10,
-                        ),
-                        child: TextField(
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            hintText: 'Confirm Your Password',
-                            hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Color(0xFFD9D9D9)),
-                            ),
-                          ),
-                        ),
-                        
+                      // Padding(
+                      //   padding: EdgeInsets.symmetric(
+                      //     horizontal: screenWidth * 0.10,
+                      //   ),
+                      //   child: TextField(
+                      //     controller: _confirmPasswordController,
+                      //     obscureText: true,
+                      //     decoration: InputDecoration(
+                      //       hintText: 'Confirm Your Password',
+                      //       hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
+                      //       border: OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(8),
+                      //         borderSide: BorderSide(color: Color(0xFFD9D9D9)),
+                      //       ),
+                      //     ),
+                      //   ),
+
+                      //),
+                      Text(
+                        errorMessage,
+                        style: TextStyle(color: Colors.redAccent),
                       ),
+                      const SizedBox(height: 10),
                       SizedBox(height: screenHeight * 0.04),
-                
                       // Sign Up Button
                       Padding(
                         padding: EdgeInsets.symmetric(
@@ -169,26 +199,24 @@ class SignUpScreen extends StatelessWidget {
                         child: SizedBox(
                           width: screenWidth * 0.70,
                           height: screenHeight * 0.05,
-    
+
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               backgroundColor: Color(0xFFFFEB00),
                               side: BorderSide(color: Color(0xFFD9D9D9)),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                
                               ),
                             ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => LoginScreen(),
-                                ),
-                              );
-                            },
+                            onPressed: register, //{
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => LoginScreen(),
+                            //   ),
+                            // );
+                            //}
                             child: Text(
-      
                               'Sign Up',
                               style: TextStyle(
                                 fontFamily: 'Geist',
@@ -207,7 +235,7 @@ class SignUpScreen extends StatelessWidget {
             ],
           ),
         ),
-        ),
+      ),
     );
   }
 }
