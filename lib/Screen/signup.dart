@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
@@ -167,30 +168,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       SizedBox(height: screenHeight * 0.02),
                       // Password Labe
-                      // Padding(
-                      //   padding: EdgeInsets.symmetric(
-                      //     horizontal: screenWidth * 0.10,
-                      //   ),
-                      //   child: TextField(
-                      //     controller: _confirmPasswordController,
-                      //     obscureText: true,
-                      //     decoration: InputDecoration(
-                      //       hintText: 'Confirm Your Password',
-                      //       hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
-                      //       border: OutlineInputBorder(
-                      //         borderRadius: BorderRadius.circular(8),
-                      //         borderSide: BorderSide(color: Color(0xFFD9D9D9)),
-                      //       ),
-                      //     ),
-                      //   ),
-
-                      //),
-                      Text(
-                        errorMessage,
-                        style: TextStyle(color: Colors.redAccent),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.10,
+                        ),
+                        child: TextField(
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            hintText: 'Confirm Your Password',
+                            hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: Color(0xFFD9D9D9)),
+                            ),
+                          ),
+                        ),
+                        
                       ),
-                      const SizedBox(height: 10),
                       SizedBox(height: screenHeight * 0.04),
+                
                       // Sign Up Button
                       Padding(
                         padding: EdgeInsets.symmetric(
