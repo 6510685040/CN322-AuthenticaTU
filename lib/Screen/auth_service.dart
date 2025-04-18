@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 ValueNotifier<AuthService> authService = ValueNotifier(AuthService());
 
@@ -49,5 +50,9 @@ class AuthService {
     );
     await currentUser!.reauthenticateWithCredential(credential);
     await currentUser!.updatePassword(newPassword);
+  }
+
+  Future<void> signInAnonymously() async {
+    await FirebaseAuth.instance.signInAnonymously();
   }
 }

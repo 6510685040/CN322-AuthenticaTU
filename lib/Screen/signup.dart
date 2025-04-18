@@ -10,8 +10,8 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final TextEditingController controllerEmail = TextEditingController();
-  final TextEditingController controllerPassword = TextEditingController();
+  TextEditingController controllerEmail = TextEditingController();
+  TextEditingController controllerPassword = TextEditingController();
   String errorMessage = '';
 
   void register() async {
@@ -20,11 +20,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
         email: controllerEmail.text,
         password: controllerPassword.text,
       );
+      popPage();
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message ?? 'There is an error';
       });
     }
+  }
+
+  void popPage() {
+    Navigator.pop(context);
   }
 
   @override
@@ -168,25 +173,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       SizedBox(height: screenHeight * 0.02),
                       // Password Labe
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.10,
-                        ),
-                        child: TextField(
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            hintText: 'Confirm Your Password',
-                            hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Color(0xFFD9D9D9)),
-                            ),
-                          ),
-                        ),
-                        
+                      // Padding(
+                      //   padding: EdgeInsets.symmetric(
+                      //     horizontal: screenWidth * 0.10,
+                      //   ),
+                      //   child: TextField(
+                      //     obscureText: true,
+                      //     decoration: InputDecoration(
+                      //       hintText: 'Confirm Your Password',
+                      //       hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
+                      //       border: OutlineInputBorder(
+                      //         borderRadius: BorderRadius.circular(8),
+                      //         borderSide: BorderSide(color: Color(0xFFD9D9D9)),
+                      //       ),
+                      //     ),
+                      //   ),
+
+                      // ),
+                      Text(
+                        errorMessage,
+                        style: TextStyle(color: Colors.redAccent),
                       ),
                       SizedBox(height: screenHeight * 0.04),
-                
+
                       // Sign Up Button
                       Padding(
                         padding: EdgeInsets.symmetric(

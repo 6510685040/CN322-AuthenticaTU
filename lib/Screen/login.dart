@@ -1,10 +1,50 @@
+import 'package:authenticatu/Screen/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:authenticatu/Screen/signup.dart';
+import 'package:authenticatu/Screen/reset_password_page.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
-
   @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  TextEditingController controllerEmail = TextEditingController();
+  TextEditingController controllerPassword = TextEditingController();
+  String errorMessage = '';
+
+  void signIn() async {
+    if (controllerEmail.text.isEmpty || controllerPassword.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Please enter both email and password.';
+      });
+      return;
+    }
+    try {
+      await authService.value.signIn(
+        email: controllerEmail.text,
+        password: controllerPassword.text,
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message ?? 'This is not working';
+      });
+    }
+  }
+
+  loginAno() async {
+    try {
+      await authService.value.signInAnonymously();
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message ?? 'This is not working';
+      });
+    }
+  }
+
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -62,7 +102,7 @@ class LoginScreen extends StatelessWidget {
                 left: screenWidth * 0.10,
                 child: Container(
                   width: screenWidth * 0.80,
-                  height: screenHeight * 0.55,
+                  height: screenHeight * 0.56,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -95,6 +135,7 @@ class LoginScreen extends StatelessWidget {
                           horizontal: screenWidth * 0.10,
                         ),
                         child: TextField(
+                          controller: controllerEmail,
                           decoration: InputDecoration(
                             hintText: 'example@hmail.com',
                             hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
@@ -131,6 +172,7 @@ class LoginScreen extends StatelessWidget {
                           horizontal: screenWidth * 0.10,
                         ),
                         child: TextField(
+                          controller: controllerPassword,
                           obscureText: true,
                           decoration: InputDecoration(
                             hintText: 'Enter your password',
@@ -142,7 +184,64 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.04),
+                      // --- Forgot Password Button ---
+                      Padding(
+                        padding: EdgeInsets.only(
+                          right:
+                              screenWidth *
+                              0.10, // Align with text field padding
+                          top: 4, // Add a small space above
+                        ),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => ResetPasswordPage(email: ''),
+                                ),
+                              );
+                            },
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                                vertical: 4.0,
+                              ),
+                              minimumSize: Size(
+                                50,
+                                30,
+                              ), // Ensure it's clickable
+                              tapTargetSize:
+                                  MaterialTapTargetSize
+                                      .shrinkWrap, // Reduce tap area
+                              alignment: Alignment.centerRight,
+                            ),
+                            child: Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                fontFamily: 'Geist',
+                                fontWeight: FontWeight.w600,
+                                fontSize:
+                                    screenWidth *
+                                    0.035, // Slightly smaller font
+                                color: Color(
+                                  0xFF000957,
+                                ), // Use app's primary color
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // --- End Forgot Password Button ---
+                      Text(
+                        errorMessage,
+                        style: TextStyle(color: Colors.redAccent),
+                      ),
+                      // SizedBox(height: screenHeight * 0.04),
+
                       // Login Button
                       Padding(
                         padding: EdgeInsets.symmetric(
@@ -158,7 +257,7 @@ class LoginScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: signIn,
                             child: Text(
                               'Login',
                               style: TextStyle(
@@ -223,14 +322,7 @@ class LoginScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => SignUpScreen(),
-                                ),
-                              );
-                            },
+                            onPressed: loginAno,
                             child: Text(
                               'Use Without Account',
                               style: TextStyle(

@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'package:authenticatu/Screen/auth_service.dart';
 import 'package:authenticatu/Screen/scanner.dart';
 import 'package:authenticatu/components/countdownbar.dart';
 import 'package:authenticatu/providers/otp_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:authenticatu/Screen/change_password_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -16,6 +19,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _timer;
   bool _isLoading = true;
   String? _error;
+
+  void logout() async {
+    try {
+      authService.value.signOut();
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+    }
+  }
 
   void _startOtpTimer() {
     final now = DateTime.now();
@@ -88,8 +99,10 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.refresh),
             onPressed: _isLoading ? null : _handleRefresh,
           ),
+          IconButton(icon: const Icon(Icons.logout), onPressed: logout),
         ],
       ),
+      drawer: const NavigationDrawer(),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -192,4 +205,36 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+}
+
+class NavigationDrawer extends StatelessWidget {
+  const NavigationDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) => Drawer(
+    child: SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[buildHeader(context), buildMenuItems(context)],
+      ),
+    ),
+  );
+
+  Widget buildHeader(BuildContext context) => Container(
+    padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+  );
+  Widget buildMenuItems(BuildContext context) => Column(
+    children: [
+      ListTile(
+        leading: const Icon(Icons.password),
+        title: const Text('Change Password'),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ChangePasswordPage()),
+          );
+        },
+      ),
+    ],
+  );
 }
