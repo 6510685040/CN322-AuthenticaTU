@@ -12,9 +12,34 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController controllerEmail = TextEditingController();
   TextEditingController controllerPassword = TextEditingController();
+  TextEditingController controllerConfirmPassword = TextEditingController();
   String errorMessage = '';
 
   void register() async {
+    final email = controllerEmail.text.trim();
+    final password = controllerPassword.text.trim();
+    final confirmPassword = controllerConfirmPassword.text.trim();
+
+    if (email.isEmpty && password.isEmpty) {
+      setState(() {
+        errorMessage = "Please enter your email and password.";
+      });
+      return;
+    }
+
+    if (password.isEmpty) {
+      setState(() {
+        errorMessage = "Please enter your password.";
+      });
+      return;
+    }
+
+    if (password != confirmPassword) {
+      setState(() {
+        errorMessage = "Passwords do not match.";
+      });
+      return;
+    }
     try {
       await authService.value.createAccount(
         email: controllerEmail.text,
@@ -133,7 +158,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.03),
+                      SizedBox(height: screenHeight * 0.01),
                       // Password Label
                       Padding(
                         padding: EdgeInsets.symmetric(
@@ -190,11 +215,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       //   ),
 
                       // ),
+                      // Password Labe
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * 0.10,
+                        ),
+                        child: TextField(
+                          controller: controllerConfirmPassword,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            hintText: 'Confirm Your Password',
+                            hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide(color: Color(0xFFD9D9D9)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.01),
                       Text(
                         errorMessage,
                         style: TextStyle(color: Colors.redAccent),
                       ),
-                      SizedBox(height: screenHeight * 0.04),
+                      SizedBox(height: screenHeight * 0.01),
 
                       // Sign Up Button
                       Padding(
