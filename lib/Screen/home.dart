@@ -3,10 +3,13 @@ import 'package:authenticatu/Screen/auth_service.dart';
 import 'package:authenticatu/Screen/scanner.dart';
 import 'package:authenticatu/components/countdownbar.dart';
 import 'package:authenticatu/providers/otp_provider.dart';
+import 'package:authenticatu/shared_pref_access.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:authenticatu/Screen/change_password_page.dart';
+import 'package:authenticatu/Screen/testpage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -207,8 +210,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class NavigationDrawer extends StatelessWidget {
+class NavigationDrawer extends StatefulWidget {
   const NavigationDrawer({super.key});
+
+  @override
+  State<NavigationDrawer> createState() => _NavigationDrawerState();
+}
+
+class _NavigationDrawerState extends State<NavigationDrawer> {
+  bool backupBool = false;
+
+  Future<void> loadBackupBool() async {
+    final result = await getSavedBool(); // your async function
+    setState(() {
+      backupBool = result;
+    });
+  }
+
+  @override
+  void initState() {
+    loadBackupBool();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) => Drawer(
@@ -223,6 +246,7 @@ class NavigationDrawer extends StatelessWidget {
   Widget buildHeader(BuildContext context) => Container(
     padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
   );
+
   Widget buildMenuItems(BuildContext context) => Column(
     children: [
       ListTile(
@@ -233,6 +257,22 @@ class NavigationDrawer extends StatelessWidget {
             context,
             MaterialPageRoute(builder: (context) => ChangePasswordPage()),
           );
+        },
+      ),
+      ListTile(
+        leading:
+            (backupBool
+                ? Icon(Icons.backup)
+                : Icon(
+                  Icons.backup,
+                  color: Colors.blue.shade400,
+                )), // CALL SHARED PREFERENCE TO USE COLOR
+        title: const Text('Back up'),
+        onTap: () {
+          setState(() {
+            toggleBool();
+            backupBool = !backupBool;
+          });
         },
       ),
     ],

@@ -6,11 +6,13 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:authenticatu/Screen/auth_layout.dart';
+import 'package:authenticatu/shared_pref_access.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await TOTPDB.initialize();
+  await initializePreferences();
   runApp(
     MultiProvider(
       providers: [
