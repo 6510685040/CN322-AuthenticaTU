@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:authenticatu/Screen/change_password_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -19,6 +20,15 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _timer;
   bool _isLoading = true;
   String? _error;
+  bool isGuest = false;
+
+  Future<void> _checkGuestUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final guest = prefs.getBool('guestUser') ?? false;
+    setState(() {
+      isGuest = guest;
+    });
+  }
 
   void logout() async {
     try {
@@ -79,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _checkGuestUser();
     reloadData();
     _startOtpTimer();
   }
@@ -99,7 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.refresh),
             onPressed: _isLoading ? null : _handleRefresh,
           ),
-          IconButton(icon: const Icon(Icons.logout), onPressed: logout),
+          if (!isGuest) // 👈 Only show if not a guest
+            IconButton(icon: const Icon(Icons.logout), onPressed: logout),
         ],
       ),
       drawer: const NavigationDrawer(),

@@ -1,9 +1,10 @@
 import 'package:authenticatu/Screen/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:authenticatu/Screen/auth_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:authenticatu/Screen/signup.dart';
 import 'package:authenticatu/Screen/reset_password_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -35,14 +36,16 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  loginAno() async {
-    try {
-      await authService.value.signInAnonymously();
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message ?? 'This is not working';
-      });
-    }
+  void loginWithoutAccount() async {
+    // Save guest mode flag
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('guestUser', true);
+
+    // Navigate to Home or AuthLayout
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const AuthLayout()),
+    );
   }
 
   Widget build(BuildContext context) {
@@ -322,7 +325,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            onPressed: loginAno,
+                            onPressed: loginWithoutAccount,
                             child: Text(
                               'Use Without Account',
                               style: TextStyle(
