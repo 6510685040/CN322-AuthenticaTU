@@ -1,26 +1,43 @@
 {
   "project_info": {
-    "project_number": "507702308056",
-    "project_id": "authenticatu-firebase",
-    "storage_bucket": "authenticatu-firebase.firebasestorage.app"
+    "project_number": "350277467736",
+    "project_id": "authenticatu",
+    "storage_bucket": "authenticatu.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:507702308056:android:93624ecd5bb0194e7dbbad",
+        "mobilesdk_app_id": "1:350277467736:android:bc4db25d7b889f1d9c942d",
         "android_client_info": {
           "package_name": "com.example.authenticatu"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "350277467736-lfj07nf8nfl48c050bid32hjndqnai0h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyB6XnbOJ7O8YUgMKudydGnQn6zpA4-tJ18"
+          "current_key": "AIzaSyB-JXhd_Juu3EyL887GusyGXJf5iO-F7go"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "350277467736-lfj07nf8nfl48c050bid32hjndqnai0h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "350277467736-h5k6aeccad12kabesi371878a0ajsv2e.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.authenticatu"
+              }
+            }
+          ]
         }
       }
     }

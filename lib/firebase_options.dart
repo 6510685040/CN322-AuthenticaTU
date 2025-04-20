@@ -17,29 +17,17 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -52,12 +40,51 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB6XnbOJ7O8YUgMKudydGnQn6zpA4-tJ18',
-    appId: '1:507702308056:android:93624ecd5bb0194e7dbbad',
-    messagingSenderId: '507702308056',
-    projectId: 'authenticatu-firebase',
-    storageBucket: 'authenticatu-firebase.firebasestorage.app',
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCIEDkneL9SXZwBVhqDmR53i0ULnZ50DXM',
+    appId: '1:350277467736:web:50fdd4cc4cb2eeaf9c942d',
+    messagingSenderId: '350277467736',
+    projectId: 'authenticatu',
+    authDomain: 'authenticatu.firebaseapp.com',
+    storageBucket: 'authenticatu.firebasestorage.app',
+    measurementId: 'G-41SHN6CL08',
   );
 
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyB-JXhd_Juu3EyL887GusyGXJf5iO-F7go',
+    appId: '1:350277467736:android:bc4db25d7b889f1d9c942d',
+    messagingSenderId: '350277467736',
+    projectId: 'authenticatu',
+    storageBucket: 'authenticatu.firebasestorage.app',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyDd2br9n6MTZtI5gDiFqJjC4eQbeZn2THE',
+    appId: '1:350277467736:ios:d8d35351ceaea3b29c942d',
+    messagingSenderId: '350277467736',
+    projectId: 'authenticatu',
+    storageBucket: 'authenticatu.firebasestorage.app',
+    iosClientId: '350277467736-h5k6aeccad12kabesi371878a0ajsv2e.apps.googleusercontent.com',
+    iosBundleId: 'com.example.authenticatu',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyDd2br9n6MTZtI5gDiFqJjC4eQbeZn2THE',
+    appId: '1:350277467736:ios:d8d35351ceaea3b29c942d',
+    messagingSenderId: '350277467736',
+    projectId: 'authenticatu',
+    storageBucket: 'authenticatu.firebasestorage.app',
+    iosClientId: '350277467736-h5k6aeccad12kabesi371878a0ajsv2e.apps.googleusercontent.com',
+    iosBundleId: 'com.example.authenticatu',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCIEDkneL9SXZwBVhqDmR53i0ULnZ50DXM',
+    appId: '1:350277467736:web:a99cc23d3a7244969c942d',
+    messagingSenderId: '350277467736',
+    projectId: 'authenticatu',
+    authDomain: 'authenticatu.firebaseapp.com',
+    storageBucket: 'authenticatu.firebasestorage.app',
+    measurementId: 'G-2XM6KY0GM1',
+  );
 }
