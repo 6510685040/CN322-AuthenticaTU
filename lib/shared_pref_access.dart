@@ -1,5 +1,4 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:authenticatu/services/firestore_service.dart';
 import 'package:authenticatu/backup_management.dart';
 
 Future<void> initializePreferences() async {
@@ -10,25 +9,19 @@ Future<void> initializePreferences() async {
   }
 }
 
-Future<bool> getSavedBool() async {
+Future<bool> getBackUpStatus() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getBool('backup') ?? false; // default to false if null
 }
 
-Future<void> toggleBool() async {
+Future<void> toggleBackUpStatus() async {
   final prefs = await SharedPreferences.getInstance();
   final boolValue = prefs.getBool('backup') ?? false;
-  final secureDataServiceObj = SecureDataService();
   if (boolValue) {
     try {
-      // secureDataServiceObj.storeSetSecret(
-      //   "7V7WzSJZ6w43OpA+/TSDlfLn4eb7U7zzymegiN6dy74=",
-      //   "Test_01",
-      //   "Epic Games",
-      // );
-      updateCloudWithMissingTOTP();
+      handleBackUp();
     } catch (e) {
-      print("ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
+      print("ERROR :");
     }
   }
   await prefs.setBool('backup', !boolValue);

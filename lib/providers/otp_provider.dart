@@ -19,6 +19,7 @@ class OtpProvider with ChangeNotifier {
   }
 
   Future<bool?> addKey(TOTPKey key) async {
+    //TODO - check backup status
     try {
       final db = TOTPDB.instance;
       final data = await db.loadAllData();
