@@ -264,7 +264,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
             (backUpStatus
                 ? Icon(Icons.backup, color: Colors.blue.shade400)
                 : Icon(Icons.backup)),
-        title: const Text('Back up'),
+        title: const Text('Back up and Restore'),
         onTap: () {
           // TODO - check if not login yet
           setState(() {
