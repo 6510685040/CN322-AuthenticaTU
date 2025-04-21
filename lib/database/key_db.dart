@@ -99,7 +99,7 @@ class TOTPDB {
       return snapshot.map((record) {
         var data = record.value as Map<String, dynamic>;
         return TOTPKey(
-          key: data["key"],
+          key: _decryptValue(data["key"]),
           label: data["label"],
           issuer: data["issuer"],
         );
@@ -113,7 +113,7 @@ class TOTPDB {
   String generateTOTP(String key) {
     try {
       return OTP.generateTOTPCodeString(
-        _decryptValue(key),
+        key,
         DateTime.now().toUtc().millisecondsSinceEpoch,
         interval: 30,
         length: 6,

@@ -218,18 +218,18 @@ class NavigationDrawer extends StatefulWidget {
 }
 
 class _NavigationDrawerState extends State<NavigationDrawer> {
-  bool backupBool = false;
+  bool backUpStatus = false;
 
-  Future<void> loadBackupBool() async {
-    final result = await getSavedBool(); // your async function
+  Future<void> loadBackUpStatus() async {
+    final status = await getBackUpStatus(); // your async function
     setState(() {
-      backupBool = result;
+      backUpStatus = status;
     });
   }
 
   @override
   void initState() {
-    loadBackupBool();
+    loadBackUpStatus();
     super.initState();
   }
 
@@ -261,17 +261,15 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
       ),
       ListTile(
         leading:
-            (backupBool
-                ? Icon(Icons.backup)
-                : Icon(
-                  Icons.backup,
-                  color: Colors.blue.shade400,
-                )), // CALL SHARED PREFERENCE TO USE COLOR
+            (backUpStatus
+                ? Icon(Icons.backup, color: Colors.blue.shade400)
+                : Icon(Icons.backup)),
         title: const Text('Back up'),
         onTap: () {
+          // TODO - check if not login yet
           setState(() {
-            toggleBool();
-            backupBool = !backupBool;
+            toggleBackUpStatus();
+            backUpStatus = !backUpStatus;
           });
         },
       ),

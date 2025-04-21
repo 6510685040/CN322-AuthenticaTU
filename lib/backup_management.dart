@@ -2,26 +2,6 @@ import 'package:authenticatu/services/firestore_service.dart';
 import 'package:authenticatu/models/keys.dart';
 import 'package:authenticatu/database/key_db.dart';
 
-// we may not use this, since comparing through == could work better.
-Future<List<String>> getCloudCombinationStringList() async {
-  final secureDataServiceObj = SecureDataService();
-  List<String> combinationStringList = [];
-  try {
-    List<Map<String, dynamic>> userSecrets =
-        await secureDataServiceObj.fetchUserSecrets();
-    for (var secret in userSecrets) {
-      String issuer = secret['issuer'] ?? '';
-      String label = secret['label'] ?? '';
-      String secretValue = secret['secretValue'] ?? '';
-      String combination = issuer + label + secretValue;
-      combinationStringList.add(combination);
-    }
-  } catch (e) {
-    print("ERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
-  }
-  return combinationStringList;
-}
-
 Future<List<TOTPKey>> getCloudSecretTOTPList() async {
   final secureDataServiceObj = SecureDataService();
   List<TOTPKey> totpList = [];
@@ -41,25 +21,26 @@ Future<List<TOTPKey>> getCloudSecretTOTPList() async {
   return totpList;
 }
 
-Future<void> updateCloudWithMissingTOTP() async {
-  await TOTPDB.initialize();
-  TOTPDB.instance;
-  List<TOTPKey> dbTOTPList = await TOTPDB.instance.loadAllData();
+Future<void> handleBackUp() async {
+  List<TOTPKey> localTOTPList = await TOTPDB.instance.loadAllData();
   List<TOTPKey> cloudTOTPList = await getCloudSecretTOTPList();
-  for (TOTPKey i in dbTOTPList) {
-    print("LOCAL");
-    print(i);
+  List<TOTPKey> toCloudList =
+      localTOTPList.where((e) => !cloudTOTPList.contains(e)).toList();
+  List<TOTPKey> toLocalList =
+      cloudTOTPList.where((e) => !localTOTPList.contains(e)).toList();
+  for (var totp in toCloudList) {
+    toCloud(totp);
   }
-  for (TOTPKey i in cloudTOTPList) {
-    print("CLOUD");
-    print(i);
+  for (var totp in toLocalList) {
+    toLoacal(totp);
   }
-  // find object in dbTOTPList that are not in cloudTOTPList
-  List<TOTPKey> differenceTOTPList =
-      dbTOTPList.where((key) => !cloudTOTPList.contains(key)).toList();
+}
 
-  for (TOTPKey i in differenceTOTPList) {
-    print("DIFF");
-    print(i);
-  }
+Future<void> toCloud(TOTPKey totp) async {
+  final secureDataServiceObj = SecureDataService();
+  await secureDataServiceObj.storeSetSecret(totp.key, totp.label, totp.issuer!);
+}
+
+Future<void> toLoacal(TOTPKey totp) async {
+  await TOTPDB.instance.insertData(totp);
 }
