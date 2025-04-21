@@ -7,6 +7,7 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:authenticatu/models/keys.dart';
 import 'package:otp/otp.dart';
+import 'package:authenticatu/backup_management.dart';
 
 class TOTPDB {
   static const String _dbName = "totp.db";
@@ -75,18 +76,18 @@ class TOTPDB {
     _database = null;
   }
 
-  Future<int> insertData(TOTPKey key) async {
+  Future<void> insertData(TOTPKey key) async {
     var db = await openDatabase();
     var store = intMapStoreFactory.store(_storeName);
 
     try {
-      return await store.add(db, {
+      await store.add(db, {
         "key": _encryptValue(key.key),
         "label": key.label,
         "issuer": key.issuer,
       });
-    } finally {
-      // Don't close the database here anymore
+    } catch (e) {
+      // db error
     }
   }
 

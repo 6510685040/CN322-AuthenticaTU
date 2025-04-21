@@ -2,6 +2,8 @@ import 'package:authenticatu/database/key_db.dart';
 import 'package:authenticatu/models/keys.dart';
 import 'package:authenticatu/models/otps.dart';
 import 'package:flutter/foundation.dart';
+import 'package:authenticatu/shared_pref_access.dart';
+import 'package:authenticatu/backup_management.dart';
 
 class OtpProvider with ChangeNotifier {
   List<Otps> otps = [];
@@ -36,6 +38,14 @@ class OtpProvider with ChangeNotifier {
 
       await db.insertData(key);
       await initData(); // Reload data after insertion
+      bool backUpBool = await getBackUpStatus();
+      if (backUpBool) {
+        try {
+          toCloud(key);
+        } catch (e) {
+          print("ERROR");
+        }
+      }
       return true;
     } catch (e) {
       debugPrint('Error adding key: $e');
