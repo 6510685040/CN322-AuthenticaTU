@@ -19,7 +19,8 @@ Future<void> toggleBackUpStatus() async {
   final boolValue = prefs.getBool('backup') ?? false;
   if (boolValue) {
     try {
-      handleBackUp();
+      final BackupService backup = BackupService();
+      backup.handleBackup();
     } catch (e) {
       print("ERROR :");
     }

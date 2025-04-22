@@ -1,5 +1,6 @@
 import 'package:authenticatu/Screen/auth_service.dart';
 import 'package:authenticatu/Screen/login.dart';
+import 'package:authenticatu/backup_management.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -45,6 +46,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         email: controllerEmail.text,
         password: controllerPassword.text,
       );
+      final backup = BackupService();
+      await backup.handleRegister(password);
+
       popPage();
     } on FirebaseAuthException catch (e) {
       setState(() {

@@ -1,6 +1,9 @@
 import 'package:authenticatu/Screen/auth_service.dart';
+import 'package:authenticatu/backup_management.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:authenticatu/Screen/auth_layout.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
 import 'package:authenticatu/Screen/signup.dart';
 import 'package:authenticatu/Screen/reset_password_page.dart';
@@ -25,10 +28,13 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
     try {
+      final password = controllerPassword.text;
       await authService.value.signIn(
         email: controllerEmail.text,
-        password: controllerPassword.text,
+        password: password,
       );
+      final backup = BackupService();
+      await backup.handleLogin(password);
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message ?? 'This is not working';
