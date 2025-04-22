@@ -12,7 +12,12 @@
           "package_name": "com.example.authenticatu"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "350277467736-lfj07nf8nfl48c050bid32hjndqnai0h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB-JXhd_Juu3EyL887GusyGXJf5iO-F7go"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "350277467736-lfj07nf8nfl48c050bid32hjndqnai0h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "350277467736-h5k6aeccad12kabesi371878a0ajsv2e.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.authenticatu"
+              }
+            }
+          ]
         }
       }
     }
