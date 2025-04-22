@@ -1,21 +1,18 @@
 import 'dart:io';
+import 'package:authenticatu/database/secure_storage.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:authenticatu/models/keys.dart';
 import 'package:otp/otp.dart';
-import 'package:authenticatu/backup_management.dart';
 
 class TOTPDB {
   static const String _dbName = "totp.db";
   static const String _storeName = "totp_keys";
-  static const String _encryptionKeyName = 'totp_encryption_key';
-  static const String _ivKeyName = 'totp_iv_key'; // Add IV storage key
 
-  static const _storage = FlutterSecureStorage();
+  final SecureStorageService _storage = SecureStorageService();
   late encrypt.Encrypter _encrypter;
   late encrypt.IV _iv;
   Database? _database; // Add database instance variable
@@ -31,25 +28,13 @@ class TOTPDB {
   }
 
   Future<void> _initializeEncryption() async {
-    // Get or generate encryption key
-    String? encryptionKey = await _storage.read(key: _encryptionKeyName);
-    String? ivString = await _storage.read(key: _ivKeyName);
+    await _storage.initializeKeys();
 
-    if (encryptionKey == null) {
-      final key = encrypt.Key.fromSecureRandom(32);
-      await _storage.write(key: _encryptionKeyName, value: key.base64);
-      encryptionKey = key.base64;
-    }
+    final encryptionKey = await _storage.getKey();
+    final ivString = await _storage.getIV();
 
-    if (ivString == null) {
-      _iv = encrypt.IV.fromSecureRandom(16);
-      await _storage.write(key: _ivKeyName, value: _iv.base64);
-    } else {
-      _iv = encrypt.IV.fromBase64(ivString);
-    }
-
-    // Initialize encrypter
-    final key = encrypt.Key.fromBase64(encryptionKey);
+    final key = encrypt.Key.fromBase64(encryptionKey!);
+    _iv = encrypt.IV.fromBase64(ivString!);
     _encrypter = encrypt.Encrypter(encrypt.AES(key));
   }
 
@@ -100,7 +85,7 @@ class TOTPDB {
       return snapshot.map((record) {
         var data = record.value as Map<String, dynamic>;
         return TOTPKey(
-          key: _decryptValue(data["key"]),
+          key: data["key"],
           label: data["label"],
           issuer: data["issuer"],
         );
@@ -114,7 +99,7 @@ class TOTPDB {
   String generateTOTP(String key) {
     try {
       return OTP.generateTOTPCodeString(
-        key,
+        _decryptValue(key),
         DateTime.now().toUtc().millisecondsSinceEpoch,
         interval: 30,
         length: 6,

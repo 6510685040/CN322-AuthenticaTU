@@ -1,12 +1,13 @@
 import 'package:authenticatu/database/key_db.dart';
 import 'package:authenticatu/models/keys.dart';
 import 'package:authenticatu/models/otps.dart';
+import 'package:authenticatu/services/firestore_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:authenticatu/shared_pref_access.dart';
-import 'package:authenticatu/backup_management.dart';
 
 class OtpProvider with ChangeNotifier {
   List<Otps> otps = [];
+  final CloudService _cloudService = CloudService();
 
   Future<void> initData() async {
     try {
@@ -41,7 +42,7 @@ class OtpProvider with ChangeNotifier {
       bool backUpBool = await getBackUpStatus();
       if (backUpBool) {
         try {
-          toCloud(key);
+          _cloudService.storeUserSecret(key.key, key.label, key.issuer!);
         } catch (e) {
           print("ERROR");
         }
