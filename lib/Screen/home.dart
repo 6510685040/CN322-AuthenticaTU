@@ -247,16 +247,16 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
 
   Widget buildMenuItems(BuildContext context) => Column(
     children: [
-      ListTile(
-        leading: const Icon(Icons.password),
-        title: const Text('Change Password'),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ChangePasswordPage()),
-          );
-        },
-      ),
+      // ListTile(
+      //   leading: const Icon(Icons.password),
+      //   title: const Text('Change Password'),
+      //   onTap: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => ChangePasswordPage()),
+      //     );
+      //   },
+      // ),
       ListTile(
         leading:
             (backUpStatus
