@@ -20,8 +20,14 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
 
     if (!isEmailVerified) {
       sendVerificationEmail();
-      Timer.periodic(Duration(seconds: 3), (_) => checkEmailVerified());
+      timer = Timer.periodic(Duration(seconds: 3), (_) => checkEmailVerified());
     }
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   Future checkEmailVerified() async {
@@ -30,12 +36,6 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
       isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     });
     if (isEmailVerified) timer?.cancel();
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
   }
 
   Future sendVerificationEmail() async {
@@ -67,7 +67,13 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
       isEmailVerified
           ? HomeScreen()
           : Scaffold(
-            appBar: AppBar(title: Text('Verify Email')),
+            appBar: AppBar(
+              title: Text(
+                'Verify Email',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Color(0xFF000957),
+            ),
             body: Padding(
               padding: EdgeInsets.all(16),
               child: Column(
@@ -82,9 +88,13 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                   ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size.fromHeight(50),
+                      backgroundColor: Color(0xFF000957),
                     ),
-                    icon: Icon(Icons.email, size: 32),
-                    label: Text('Resend Email', style: TextStyle(fontSize: 24)),
+                    icon: Icon(Icons.email, size: 32, color: Colors.white),
+                    label: Text(
+                      'Resend Email',
+                      style: TextStyle(fontSize: 24, color: Colors.white),
+                    ),
                     onPressed: canResendEmail ? sendVerificationEmail : null,
                   ),
                   SizedBox(height: 8),
@@ -92,7 +102,10 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size.fromHeight(50),
                     ),
-                    child: Text('Cancel', style: TextStyle(fontSize: 24)),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(fontSize: 24, color: Colors.black),
+                    ),
                     onPressed: () => FirebaseAuth.instance.signOut(),
                   ),
                 ],
