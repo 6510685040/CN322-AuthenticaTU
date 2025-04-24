@@ -68,7 +68,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     return Scaffold(
       backgroundColor: Color(0xFF000957),
-      body: SingleChildScrollView(
+      body: Container(
+        width: screenWidth,
+        height: screenHeight,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF000957),
+              Color.fromARGB(255, 16, 27, 126),
+              Color.fromARGB(255, 54, 63, 142),
+              Color.fromARGB(255, 79, 84, 130),
+              Color.fromARGB(255, 255, 255, 255),
+            ],
+          ),
+        ),
+      
+      child: SingleChildScrollView(
         child: SizedBox(
           width: screenWidth,
           height: screenHeight,
@@ -79,8 +96,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 left: screenWidth * 0.20,
                 child: RichText(
                   text: TextSpan(
-                    style: TextStyle(
-                      fontFamily: 'Geist',
+                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                      //fontFamily: 'Geist',
                       fontWeight: FontWeight.w800,
                       fontSize: screenWidth * 0.10,
                     ),
@@ -104,7 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: Text(
                   'Lock your world, secure your life',
                   style: TextStyle(
-                    fontFamily: 'Geist',
+                    //fontFamily: 'Geist',
                     fontWeight: FontWeight.w600,
                     fontSize: screenWidth * 0.035,
                     color: Colors.white,
@@ -136,7 +153,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           child: Text(
                             'Email',
                             style: TextStyle(
-                              fontFamily: 'Geist',
+                              //fontFamily: 'Geist',
                               fontWeight: FontWeight.w600,
                               fontSize: screenWidth * 0.04,
                               color: Color(0xFF1E1E1E),
@@ -153,7 +170,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         child: TextField(
                           controller: controllerEmail,
                           decoration: InputDecoration(
-                            hintText: 'Enter your email',
+                            hintText: 'example@hmail.com',
                             hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -173,7 +190,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           child: Text(
                             'Password',
                             style: TextStyle(
-                              fontFamily: 'Geist',
+                              //fontFamily: 'Geist',
                               fontWeight: FontWeight.w600,
                               fontSize: screenWidth * 0.04,
                               color: Color(0xFF1E1E1E),
@@ -251,12 +268,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         child: SizedBox(
                           width: screenWidth * 0.70,
-                          height: screenHeight * 0.05,
+                          height: screenHeight * 0.06,
 
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               backgroundColor: Color(0xFFFFEB00),
-                              side: BorderSide(color: Color(0xFFD9D9D9)),
+                              side: const BorderSide(color: Colors.transparent),//BorderSide(color: Color(0xFFD9D9D9)),
+                              elevation: 2,
+                              shadowColor: Colors.black26,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -272,7 +291,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             child: Text(
                               'Sign Up',
                               style: TextStyle(
-                                fontFamily: 'Geist',
+                                //fontFamily: 'Geist',
                                 fontWeight: FontWeight.w600,
                                 fontSize: screenWidth * 0.045,
                                 color: Color(0xFF2C2C2C),
@@ -288,6 +307,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

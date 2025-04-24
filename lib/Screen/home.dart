@@ -6,6 +6,8 @@ import 'package:authenticatu/providers/otp_provider.dart';
 import 'package:authenticatu/shared_pref_access.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:authenticatu/Screen/change_password_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -105,7 +107,27 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Authenticator'),
+        title: RichText(
+          text: TextSpan(
+            style: Theme.of(context).textTheme.displayLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+            ),
+            children: const [
+              TextSpan(
+                text: 'Authentica',
+                style: TextStyle(color: Colors.white),
+              ),
+              TextSpan(
+                text: 'TU',
+                style: TextStyle(color: Color(0xFFFFEB00)),
+              ),
+            ],
+          ),
+        ),
+      //titleTextStyle: Theme.of(context).textTheme.displayLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
+        backgroundColor: Color(0xFF000957),
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -113,11 +135,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           if (!isGuest) // 👈 Only show if not a guest
             IconButton(icon: const Icon(Icons.logout), onPressed: logout),
+            
         ],
+        centerTitle: true,
       ),
+      
       drawer: const NavigationDrawer(),
       body: _buildBody(),
+      backgroundColor: Color(0xFFFAFAFA),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF000957),
+        //shape: const CircleBorder(),
         onPressed: () {
           Navigator.push(
             context,
@@ -126,7 +154,8 @@ class _HomeScreenState extends State<HomeScreen> {
             (_) => reloadData(),
           ); // Reload data after returning from scanner
         },
-        child: const Icon(Icons.qr_code_scanner),
+        child: const Icon(Icons.qr_code_scanner, color: Colors.yellow,),
+        
       ),
     );
   }
@@ -158,12 +187,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (itemCount <= 0) {
           return Center(
+            child: Transform.translate(
+              offset: const Offset(0, -40),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("ไม่พบข้อมูล", style: TextStyle(fontSize: 35)),
-                const SizedBox(height: 16),
+                const Icon(
+                Icons.error,//warning_amber_rounded,
+                size: 80,
+                color: Color.fromARGB(255, 197, 195, 195),
+              ),
+              const SizedBox(height: 16),
+                const Text("Data not found", style: TextStyle(fontSize: 30)),
+                const SizedBox(height: 18),
                 ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF000957),
+                    shape: const StadiumBorder(),
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -172,41 +213,110 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ).then((_) => reloadData());
                   },
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: const Text('Scan QR Code'),
+                  icon: const Icon(Icons.qr_code_scanner, color: Colors.yellow,),
+                  label: const Text('Scan QR Code', style: TextStyle(color: Colors.yellow)),
                 ),
               ],
             ),
+          ),
           );
         }
 
         return RefreshIndicator(
+          
           onRefresh: _handleRefresh,
+          //color: const Color(0xFF000957),
+          //color: Theme.of(context).Color(0xFF000957),
+          //backgroundColor: const Color.fromARGB(255, 195, 38, 38),
           child: Column(
             children: [
               TOTPCountdownBar(),
               Expanded(
                 child: ListView.builder(
                   physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: itemCount,
                   itemBuilder: (context, index) {
                     final otp = provider.otps[index];
                     return Card(
                       margin: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                        horizontal: 16,
+                        vertical: 8,
                       ),
-                      child: ListTile(
-                        leading: Text(
-                          otp.key,
-                          style: const TextStyle(
-                            fontFamily: 'Monospace',
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      elevation: 2,
+                      color: Color.fromARGB(255, 245, 245, 239),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 140,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                //color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                color: const Color.fromARGB(49, 199, 200, 200),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                otp.key,
+                                style: TextStyle(
+                                  fontFamily: GoogleFonts.rubik().fontFamily,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w500,
+                                  //color: Theme.of(context).primaryColor,
+                                  color: const Color(0xFF000957),
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    otp.label,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF000957),
+                                    ),
+                                  ),
+                                  if (otp.issuer != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4),
+                                      child: Text(
+                                        otp.issuer!,
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.copy_rounded,
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                              onPressed: () {
+                                Clipboard.setData(ClipboardData(text: otp.key));
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('OTP copied to clipboard'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                        title: Text(otp.label),
-                        subtitle: otp.issuer != null ? Text(otp.issuer!) : null,
                       ),
                     );
                   },
@@ -245,6 +355,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
 
   @override
   Widget build(BuildContext context) => Drawer(
+    backgroundColor: const Color(0xFFFAFAFA),
     child: SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -258,6 +369,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
   );
 
   Widget buildMenuItems(BuildContext context) => Column(
+    
     children: [
       // ListTile(
       //   leading: const Icon(Icons.password),
@@ -269,12 +381,20 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
       //     );
       //   },
       // ),
+      //Container(
+      //color: Colors.grey[200], // Choose your desired background color
+      //child:
       ListTile(
         leading:
             (backUpStatus
                 ? Icon(Icons.backup, color: Colors.blue.shade400)
                 : Icon(Icons.backup)),
-        title: const Text('Back up and Restore'),
+        title: const Text('Back up and Restore'), 
+        titleTextStyle: Theme.of(context).textTheme.displayLarge?.copyWith(
+          color: Color(0xFF000957),
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+        ),   
         onTap: () {
           // TODO - check if not login yet
           setState(() {
@@ -283,6 +403,8 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           });
         },
       ),
+    //  ),
     ],
+  
   );
 }

@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:authenticatu/Screen/auth_layout.dart';
 import 'package:authenticatu/shared_pref_access.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +36,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Authenticator',
       home: const AuthLayout(), // ✅ AuthLayout will decide which screen to show
+      theme: ThemeData(
+          textTheme: GoogleFonts.k2dTextTheme(
+            Theme.of(context).textTheme
+          )
+        ),
     );
   }
 }

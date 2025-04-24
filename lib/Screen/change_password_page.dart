@@ -71,7 +71,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         foregroundColor: Colors.white,
         title: Text(
           'Change Password',
-          style: TextStyle(fontFamily: 'Geist', fontWeight: FontWeight.w600),
+          style: TextStyle(/*fontFamily: 'Geist',*/ fontWeight: FontWeight.w600),
         ),
         elevation: 0,
       ),
@@ -87,8 +87,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 left: screenWidth * 0.10,
                 child: RichText(
                   text: TextSpan(
-                    style: TextStyle(
-                      fontFamily: 'Geist',
+                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                      //fontFamily: 'Geist',
                       fontWeight: FontWeight.w800,
                       fontSize: screenWidth * 0.08,
                     ),
@@ -113,7 +113,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 child: Text(
                   'Keep your account secure with a strong password',
                   style: TextStyle(
-                    fontFamily: 'Geist',
+                    //fontFamily: 'Geist',
                     fontWeight: FontWeight.w600,
                     fontSize: screenWidth * 0.035,
                     color: Colors.white,
@@ -146,7 +146,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           child: Text(
                             'Email',
                             style: TextStyle(
-                              fontFamily: 'Geist',
+                             // fontFamily: 'Geist',
                               fontWeight: FontWeight.w600,
                               fontSize: screenWidth * 0.04,
                               color: Color(0xFF1E1E1E),
@@ -186,7 +186,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           child: Text(
                             'Current Password',
                             style: TextStyle(
-                              fontFamily: 'Geist',
+                              //fontFamily: 'Geist',
                               fontWeight: FontWeight.w600,
                               fontSize: screenWidth * 0.04,
                               color: Color(0xFF1E1E1E),
@@ -205,6 +205,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           controller: controllerCurrentPassword,
                           obscureText: true,
                           decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.lock_outline),
                             hintText: 'Enter your current password',
                             hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
                             border: OutlineInputBorder(
@@ -226,7 +227,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           child: Text(
                             'New Password',
                             style: TextStyle(
-                              fontFamily: 'Geist',
+                              //fontFamily: 'Geist',
                               fontWeight: FontWeight.w600,
                               fontSize: screenWidth * 0.04,
                               color: Color(0xFF1E1E1E),
@@ -245,6 +246,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                           controller: controllerNewPassword,
                           obscureText: true,
                           decoration: InputDecoration(
+                            prefixIcon: Icon(Icons.lock_outline),
                             hintText: 'Enter your new password',
                             hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
                             border: OutlineInputBorder(
@@ -265,7 +267,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                             errorMessage,
                             style: TextStyle(
                               color: Colors.redAccent,
-                              fontFamily: 'Geist',
+                              //fontFamily: 'Geist',
                               fontSize: screenWidth * 0.035,
                             ),
                           ),
@@ -281,11 +283,13 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                             successMessage,
                             style: TextStyle(
                               color: Colors.green,
-                              fontFamily: 'Geist',
+                              //fontFamily: 'Geist',
                               fontSize: screenWidth * 0.035,
                             ),
                           ),
                         ),
+
+                        const SizedBox(height: 20),
 
                       // Update Password Button
                       Padding(
@@ -316,7 +320,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                                     : Text(
                                       'Update Password',
                                       style: TextStyle(
-                                        fontFamily: 'Geist',
+                                        //fontFamily: 'Geist',
                                         fontWeight: FontWeight.w600,
                                         fontSize: screenWidth * 0.045,
                                         color: Color(0xFF2C2C2C),
@@ -349,7 +353,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                             child: Text(
                               'Cancel',
                               style: TextStyle(
-                                fontFamily: 'Geist',
+                                //fontFamily: 'Geist',
                                 fontWeight: FontWeight.w600,
                                 fontSize: screenWidth * 0.045,
                                 color: Color(0xFF2C2C2C),

@@ -60,7 +60,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       backgroundColor: Color(0xFF000957),
-      body: SingleChildScrollView(
+      body: Container(
+        width: screenWidth,
+        height: screenHeight,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF000957),
+              Color.fromARGB(255, 16, 27, 126),
+              Color.fromARGB(255, 54, 63, 142),
+              Color.fromARGB(255, 79, 84, 130),
+              Color.fromARGB(255, 255, 255, 255),
+            ],
+          ),
+        ),
+      child: SingleChildScrollView(
         child: SizedBox(
           width: screenWidth,
           height: screenHeight,
@@ -71,8 +87,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 left: screenWidth * 0.20,
                 child: RichText(
                   text: TextSpan(
-                    style: TextStyle(
-                      fontFamily: 'Geist',
+                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                      //fontFamily: 'Geist',
                       fontWeight: FontWeight.w800,
                       fontSize: screenWidth * 0.10,
                     ),
@@ -97,10 +113,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Text(
                   'Lock your world, secure your life',
                   style: TextStyle(
-                    fontFamily: 'Geist',
+                    //fontFamily: 'Geist',
                     fontWeight: FontWeight.w600,
                     fontSize: screenWidth * 0.035,
-                    color: Colors.white,
+                    color: Colors.white70,
                   ),
                 ),
               ),
@@ -115,6 +131,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 12,
+                        offset: Offset(0, 6),
+                      ),
+                    ],
                   ),
                   child: Column(
                     children: [
@@ -129,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Text(
                             'Email',
                             style: TextStyle(
-                              fontFamily: 'Geist',
+                              //fontFamily: 'Geist',
                               fontWeight: FontWeight.w600,
                               fontSize: screenWidth * 0.04,
                               color: Color(0xFF1E1E1E),
@@ -150,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             hintStyle: TextStyle(color: Color(0xFFB3B3B3)),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide(color: Color(0xFFD9D9D9)),
+                              borderSide: BorderSide(color: Color(0xFFD9D9D9)),                              
                             ),
                           ),
                         ),
@@ -166,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Text(
                             'Password',
                             style: TextStyle(
-                              fontFamily: 'Geist',
+                              //fontFamily: 'Geist',
                               fontWeight: FontWeight.w600,
                               fontSize: screenWidth * 0.04,
                               color: Color(0xFF1E1E1E),
@@ -230,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Text(
                               'Forgot Password?',
                               style: TextStyle(
-                                fontFamily: 'Geist',
+                                //fontFamily: 'Geist',
                                 fontWeight: FontWeight.w600,
                                 fontSize:
                                     screenWidth *
@@ -264,14 +287,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               backgroundColor: Color(0xFFFFEB00),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
+                                side: BorderSide.none
                               ),
                             ),
                             onPressed: signIn,
                             child: Text(
                               'Login',
                               style: TextStyle(
-                                fontFamily: 'Geist',
-                                fontWeight: FontWeight.w600,
+                                //fontFamily: 'Geist',
+                                //fontWeight: FontWeight.w900,//FontWeight.w600,
                                 fontSize: screenWidth * 0.045,
                                 color: Color(0xFF2C2C2C),
                               ),
@@ -279,7 +303,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.02),
+                      SizedBox(height: screenHeight * 0.015),
                       // Sign Up Button
                       Padding(
                         padding: EdgeInsets.symmetric(
@@ -287,10 +311,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: SizedBox(
                           width: screenWidth * 0.70,
-                          height: screenHeight * 0.05,
+                          height: screenHeight * 0.05,                          
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: Color(0xFFD9D9D9)),
+                              side: BorderSide.none,//BorderSide(color: Color(0xFFD9D9D9)),
+                              backgroundColor: Color.fromARGB(128, 217, 217, 217),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -306,8 +331,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Text(
                               'Sign Up',
                               style: TextStyle(
-                                fontFamily: 'Geist',
-                                fontWeight: FontWeight.w600,
+                                //fontFamily: 'Geist',
+                                //fontWeight: FontWeight.w900,
                                 fontSize: screenWidth * 0.045,
                                 color: Color(0xFF2C2C2C),
                               ),
@@ -315,8 +340,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.02),
+                      SizedBox(height: screenHeight * 0.015),
+                      SizedBox(
+                        //height: screenHeight * 0.015),
+                        width: screenWidth * 0.60,
+                        height: screenHeight * 0.05,
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            side: BorderSide(color: Color(0xFFD9D9D9), width: 1.5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
                       // use without account
+                      /*
                       Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: screenWidth * 0.10,
@@ -326,24 +364,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: screenHeight * 0.05,
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: Color(0xFFD9D9D9)),
+                              side: BorderSide.none,//BorderSide(color: Color(0xFFD9D9D9)),
+                              backgroundColor: Color.fromARGB(128, 217, 217, 217),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                            ),
+                            ),*/
                             onPressed: loginWithoutAccount,
                             child: Text(
                               'Use Without Account',
                               style: TextStyle(
-                                fontFamily: 'Geist',
-                                fontWeight: FontWeight.w600,
+                                //fontFamily: 'Geist',
+                                //: FontWeight.w600,
                                 fontSize: screenWidth * 0.045,
                                 color: Color(0xFF2C2C2C),
                               ),
                             ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -351,6 +389,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }
