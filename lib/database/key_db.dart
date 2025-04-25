@@ -42,6 +42,10 @@ class TOTPDB {
     return _encrypter.encrypt(value, iv: _iv).base64;
   }
 
+  String encryptValue(String value) {
+    return _encryptValue(value);
+  }
+
   String _decryptValue(String encrypted) {
     return _encrypter.decrypt64(encrypted, iv: _iv);
   }
@@ -68,6 +72,21 @@ class TOTPDB {
     try {
       await store.add(db, {
         "key": _encryptValue(key.key),
+        "label": key.label,
+        "issuer": key.issuer,
+      });
+    } catch (e) {
+      // db error
+    }
+  }
+
+  Future<void> insertWithoutEncryption(TOTPKey key) async {
+    var db = await openDatabase();
+    var store = intMapStoreFactory.store(_storeName);
+
+    try {
+      await store.add(db, {
+        "key": key.key,
         "label": key.label,
         "issuer": key.issuer,
       });
@@ -107,7 +126,7 @@ class TOTPDB {
         isGoogle: true,
       );
     } catch (e) {
-      // print('Error generating TOTP: $e');
+      print('Error generating TOTP: $e');
       return '------';
     }
   }

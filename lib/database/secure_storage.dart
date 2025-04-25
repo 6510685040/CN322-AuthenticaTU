@@ -39,7 +39,7 @@ class SecureStorageService {
   }
 
   Future<void> setIV(String iv) async {
-    _storage.write(key: _encryptionKeyName, value: _ivKeyName);
+    _storage.write(key: _ivKeyName, value: iv);
   }
 
   // Future<void> delete(String key) => _storage.delete(key: key);

@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:authenticatu/Screen/change_password_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -118,14 +119,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 text: 'Authentica',
                 style: TextStyle(color: Colors.white),
               ),
-              TextSpan(
-                text: 'TU',
-                style: TextStyle(color: Color(0xFFFFEB00)),
-              ),
+              TextSpan(text: 'TU', style: TextStyle(color: Color(0xFFFFEB00))),
             ],
           ),
         ),
-      //titleTextStyle: Theme.of(context).textTheme.displayLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
+        //titleTextStyle: Theme.of(context).textTheme.displayLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
         backgroundColor: Color(0xFF000957),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
@@ -135,11 +133,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           if (!isGuest) // 👈 Only show if not a guest
             IconButton(icon: const Icon(Icons.logout), onPressed: logout),
-            
         ],
         centerTitle: true,
       ),
-      
+
       drawer: const NavigationDrawer(),
       body: _buildBody(),
       backgroundColor: Color(0xFFFAFAFA),
@@ -154,8 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
             (_) => reloadData(),
           ); // Reload data after returning from scanner
         },
-        child: const Icon(Icons.qr_code_scanner, color: Colors.yellow,),
-        
+        child: const Icon(Icons.qr_code_scanner, color: Colors.yellow),
       ),
     );
   }
@@ -189,41 +185,46 @@ class _HomeScreenState extends State<HomeScreen> {
           return Center(
             child: Transform.translate(
               offset: const Offset(0, -40),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                Icons.error,//warning_amber_rounded,
-                size: 80,
-                color: Color.fromARGB(255, 197, 195, 195),
-              ),
-              const SizedBox(height: 16),
-                const Text("Data not found", style: TextStyle(fontSize: 30)),
-                const SizedBox(height: 18),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF000957),
-                    shape: const StadiumBorder(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error, //warning_amber_rounded,
+                    size: 80,
+                    color: Color.fromARGB(255, 197, 195, 195),
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => QRScannerScreen(),
-                      ),
-                    ).then((_) => reloadData());
-                  },
-                  icon: const Icon(Icons.qr_code_scanner, color: Colors.yellow,),
-                  label: const Text('Scan QR Code', style: TextStyle(color: Colors.yellow)),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  const Text("Data not found", style: TextStyle(fontSize: 30)),
+                  const SizedBox(height: 18),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF000957),
+                      shape: const StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QRScannerScreen(),
+                        ),
+                      ).then((_) => reloadData());
+                    },
+                    icon: const Icon(
+                      Icons.qr_code_scanner,
+                      color: Colors.yellow,
+                    ),
+                    label: const Text(
+                      'Scan QR Code',
+                      style: TextStyle(color: Colors.yellow),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
           );
         }
 
         return RefreshIndicator(
-          
           onRefresh: _handleRefresh,
           //color: const Color(0xFF000957),
           //color: Theme.of(context).Color(0xFF000957),
@@ -292,7 +293,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: Text(
                                         otp.issuer!,
                                         style: TextStyle(
-                                          color: Theme.of(context).textTheme.bodySmall?.color,
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).textTheme.bodySmall?.color,
                                           fontSize: 16,
                                         ),
                                       ),
@@ -369,42 +373,60 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
   );
 
   Widget buildMenuItems(BuildContext context) => Column(
-    
     children: [
-      // ListTile(
-      //   leading: const Icon(Icons.password),
-      //   title: const Text('Change Password'),
-      //   onTap: () {
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(builder: (context) => ChangePasswordPage()),
-      //     );
-      //   },
-      // ),
-      //Container(
-      //color: Colors.grey[200], // Choose your desired background color
-      //child:
       ListTile(
         leading:
             (backUpStatus
                 ? Icon(Icons.backup, color: Colors.blue.shade400)
                 : Icon(Icons.backup)),
-        title: const Text('Back up and Restore'), 
+        title: const Text('Back up and Restore'),
         titleTextStyle: Theme.of(context).textTheme.displayLarge?.copyWith(
           color: Color(0xFF000957),
           fontWeight: FontWeight.bold,
           fontSize: 20,
-        ),   
-        onTap: () {
-          // TODO - check if not login yet
-          setState(() {
-            toggleBackUpStatus();
-            backUpStatus = !backUpStatus;
-          });
+        ),
+        onTap: () async {
+          Navigator.pop(context);
+          try {
+            await toggleBackUpStatus();
+            setState(() {
+              backUpStatus = !backUpStatus;
+            });
+            if (!context.mounted) return;
+            if (backUpStatus) {
+              Fluttertoast.showToast(
+                msg: 'Backup operation completed successfully!',
+                toastLength: Toast.LENGTH_LONG,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: 16.0,
+              );
+            } else {
+              Fluttertoast.showToast(
+                msg: 'Turned off backup operation successfully!',
+                toastLength: Toast.LENGTH_LONG,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: 16.0,
+              );
+            }
+          } catch (e) {
+            Fluttertoast.showToast(
+              msg: 'Backup operation failed: ${e.toString()}',
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 3,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
+          }
         },
       ),
-    //  ),
     ],
-  
   );
 }

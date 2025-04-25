@@ -42,7 +42,11 @@ class OtpProvider with ChangeNotifier {
       bool backUpBool = await getBackUpStatus();
       if (backUpBool) {
         try {
-          _cloudService.storeUserSecret(key.key, key.label, key.issuer!);
+          _cloudService.storeUserSecret(
+            TOTPDB.instance.encryptValue(key.key),
+            key.label,
+            key.issuer!,
+          );
         } catch (e) {
           print("ERROR");
         }

@@ -27,6 +27,7 @@ class BackupService {
         String issuer = secret['issuer'] ?? '';
         String label = secret['label'] ?? '';
         String secretValue = secret['secretValue'] ?? '';
+
         totpList.add(TOTPKey(key: secretValue, label: label, issuer: issuer));
       }
     } catch (e) {
@@ -90,7 +91,7 @@ class BackupService {
       );
     }
     for (var totp in toLocalList) {
-      await TOTPDB.instance.insertData(totp);
+      await TOTPDB.instance.insertWithoutEncryption(totp);
     }
   }
 
@@ -113,7 +114,12 @@ class BackupService {
 
   Future<void> handleLogin(String password) async {
     final saltString = await _cloudService.fetchUserInfo("salt");
+    print("###############");
+    print(saltString);
     final salt = base64.decode(saltString!);
+    print("###############");
+    print(salt);
+
     final pbkdf2Key = await getPBKDF2(salt, password);
     final encAESKey = await _cloudService.fetchUserInfo("key");
     final ivString = await _cloudService.fetchUserInfo("iv");
@@ -124,7 +130,8 @@ class BackupService {
       throw Exception("Can't get AES key in secure storage");
     }
 
-    final aesKey = encrypter.encrypt(encAESKey, iv: iv).base64;
+    final aesKey = encrypter.decrypt64(encAESKey, iv: iv);
+
     await _secureStorageService.setKey(aesKey);
     await _secureStorageService.setIV(ivString);
   }
