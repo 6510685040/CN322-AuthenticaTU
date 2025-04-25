@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:authenticatu/Screen/change_password_page.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _handleRefresh() async {
+  Future<void> handleRefresh() async {
     setState(() {
       _isLoading = true;
       _error = null;
@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _isLoading ? null : _handleRefresh,
+            onPressed: _isLoading ? null : handleRefresh,
           ),
           if (!isGuest) // 👈 Only show if not a guest
             IconButton(icon: const Icon(Icons.logout), onPressed: logout),
@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
       ),
 
-      drawer: const NavigationDrawer(),
+      drawer: NavigationDrawer(onRefresh: handleRefresh),
       body: _buildBody(),
       backgroundColor: Color(0xFFFAFAFA),
       floatingActionButton: FloatingActionButton(
@@ -169,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(_error!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _handleRefresh,
+              onPressed: handleRefresh,
               child: const Text('Try Again'),
             ),
           ],
@@ -225,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         return RefreshIndicator(
-          onRefresh: _handleRefresh,
+          onRefresh: handleRefresh,
           //color: const Color(0xFF000957),
           //color: Theme.of(context).Color(0xFF000957),
           //backgroundColor: const Color.fromARGB(255, 195, 38, 38),
@@ -335,7 +335,8 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class NavigationDrawer extends StatefulWidget {
-  const NavigationDrawer({super.key});
+  final Future<void> Function() onRefresh;
+  const NavigationDrawer({super.key, required this.onRefresh});
 
   @override
   State<NavigationDrawer> createState() => _NavigationDrawerState();
@@ -346,6 +347,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
 
   Future<void> loadBackUpStatus() async {
     final status = await getBackUpStatus(); // your async function
+
     setState(() {
       backUpStatus = status;
     });
@@ -386,13 +388,16 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           fontSize: 20,
         ),
         onTap: () async {
-          Navigator.pop(context);
           try {
             await toggleBackUpStatus();
+            await widget.onRefresh();
             setState(() {
               backUpStatus = !backUpStatus;
             });
-            if (!context.mounted) return;
+            // Optionally close the drawer after refresh
+            if (context.mounted) {
+              Navigator.pop(context);
+            }
             if (backUpStatus) {
               Fluttertoast.showToast(
                 msg: 'Backup operation completed successfully!',
