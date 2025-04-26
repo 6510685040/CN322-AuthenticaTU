@@ -1,4 +1,5 @@
 import 'package:authenticatu/database/key_db.dart';
+import 'package:authenticatu/database/secure_storage.dart';
 import 'package:authenticatu/providers/otp_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await TOTPDB.initialize();
+  await SecureStorageService().initialize();
   await initializePreferences();
   runApp(
     MultiProvider(
@@ -37,10 +38,8 @@ class MyApp extends StatelessWidget {
       title: 'Authenticator',
       home: const AuthLayout(), // ✅ AuthLayout will decide which screen to show
       theme: ThemeData(
-          textTheme: GoogleFonts.k2dTextTheme(
-            Theme.of(context).textTheme
-          )
-        ),
+        textTheme: GoogleFonts.k2dTextTheme(Theme.of(context).textTheme),
+      ),
     );
   }
 }

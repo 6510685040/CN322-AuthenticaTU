@@ -7,6 +7,7 @@ import 'package:authenticatu/models/keys.dart';
 import 'package:authenticatu/database/key_db.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:flutter/foundation.dart';
 
 class BackupService {
   static final BackupService _instance = BackupService._internal();
@@ -15,8 +16,9 @@ class BackupService {
 
   factory BackupService() => _instance;
 
-  final CloudService _cloudService = CloudService();
-  final SecureStorageService _secureStorageService = SecureStorageService();
+  final _cloudService = CloudService();
+  final _db = TOTPDB();
+  final _secureStorageService = SecureStorageService();
 
   Future<List<TOTPKey>> getCloudSecretTOTPList() async {
     List<TOTPKey> totpList = [];
@@ -31,7 +33,7 @@ class BackupService {
         totpList.add(TOTPKey(key: secretValue, label: label, issuer: issuer));
       }
     } catch (e) {
-      print("Error loading cloud secrets: $e");
+      debugPrint("Error loading cloud secrets: $e");
     }
     return totpList;
   }
@@ -75,7 +77,7 @@ class BackupService {
   }
 
   Future<void> handleBackup() async {
-    List<TOTPKey> localTOTPList = await TOTPDB.instance.loadAllData();
+    List<TOTPKey> localTOTPList = await _db.loadAllData();
     List<TOTPKey> cloudTOTPList = await getCloudSecretTOTPList();
 
     List<TOTPKey> toCloudList =
@@ -91,48 +93,56 @@ class BackupService {
       );
     }
     for (var totp in toLocalList) {
-      await TOTPDB.instance.insertWithoutEncryption(totp);
+      await _db.insertWithoutEncryption(totp);
     }
   }
 
   Future<void> handleRegister(String password) async {
     final salt = await genSalt();
     final pbkdf2Key = await getPBKDF2(salt, password);
-    final aesKey = await _secureStorageService.getKey();
-    final ivString = await _secureStorageService.getIV();
-    final iv = encrypt.IV.fromBase64(ivString!);
-    final encrypter = encrypt.Encrypter(encrypt.AES(pbkdf2Key));
 
+    final aesKey = await _secureStorageService.getKey();
     if (aesKey == null) {
       throw Exception("Can't get AES key in secure storage");
     }
 
+    final ivString = await _secureStorageService.getIV();
+    if (ivString == null) {
+      throw Exception("Can't get IV in secure storage");
+    }
+
+    final encrypter = encrypt.Encrypter(encrypt.AES(pbkdf2Key));
+    final iv = encrypt.IV.fromBase64(ivString);
     final encAESKey = encrypter.encrypt(aesKey, iv: iv).base64;
+
     await _cloudService.storeUserInfo("key", encAESKey);
     await _cloudService.storeUserInfo("iv", ivString);
   }
 
   Future<void> handleLogin(String password) async {
     final saltString = await _cloudService.fetchUserInfo("salt");
-    print("###############");
-    print(saltString);
-    final salt = base64.decode(saltString!);
-    print("###############");
-    print(salt);
-
-    final pbkdf2Key = await getPBKDF2(salt, password);
-    final encAESKey = await _cloudService.fetchUserInfo("key");
-    final ivString = await _cloudService.fetchUserInfo("iv");
-    final iv = encrypt.IV.fromBase64(ivString!);
-    final encrypter = encrypt.Encrypter(encrypt.AES(pbkdf2Key));
-
-    if (encAESKey == null) {
-      throw Exception("Can't get AES key in secure storage");
+    if (saltString == null) {
+      throw Exception("Can't get salt in cloud");
     }
 
+    final encAESKey = await _cloudService.fetchUserInfo("key");
+    if (encAESKey == null) {
+      throw Exception("Can't get encrypted AES Key in cloud");
+    }
+
+    final ivString = await _cloudService.fetchUserInfo("iv");
+    if (ivString == null) {
+      throw Exception("Can't get IV in cloud");
+    }
+
+    final salt = base64.decode(saltString);
+    final pbkdf2Key = await getPBKDF2(salt, password);
+    final iv = encrypt.IV.fromBase64(ivString);
+    final encrypter = encrypt.Encrypter(encrypt.AES(pbkdf2Key));
     final aesKey = encrypter.decrypt64(encAESKey, iv: iv);
 
     await _secureStorageService.setKey(aesKey);
     await _secureStorageService.setIV(ivString);
+    await _secureStorageService.reinitialize();
   }
 }

@@ -46,8 +46,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         email: controllerEmail.text,
         password: controllerPassword.text,
       );
-      final backup = BackupService();
-      await backup.handleRegister(password);
+      await BackupService().handleRegister(password);
 
       popPage();
     } on FirebaseAuthException catch (e) {

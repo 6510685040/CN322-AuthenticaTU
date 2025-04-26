@@ -17,13 +17,12 @@ Future<bool> getBackUpStatus() async {
 Future<void> toggleBackUpStatus() async {
   final prefs = await SharedPreferences.getInstance();
   final boolValue = prefs.getBool('backup') ?? false;
+  await prefs.setBool('backup', !boolValue);
   if (!boolValue) {
     try {
-      final BackupService backup = BackupService();
-      backup.handleBackup();
+      BackupService().handleBackup();
     } catch (e) {
       print("ERROR : $e");
     }
   }
-  await prefs.setBool('backup', !boolValue);
 }

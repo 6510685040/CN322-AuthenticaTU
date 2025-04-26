@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:authenticatu/database/secure_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
@@ -11,44 +12,13 @@ import 'package:otp/otp.dart';
 class TOTPDB {
   static const String _dbName = "totp.db";
   static const String _storeName = "totp_keys";
+  Database? _database;
+  final _secure = SecureStorageService();
 
-  final SecureStorageService _storage = SecureStorageService();
-  late encrypt.Encrypter _encrypter;
-  late encrypt.IV _iv;
-  Database? _database; // Add database instance variable
+  static final TOTPDB _instance = TOTPDB._internal();
 
-  static final TOTPDB instance = TOTPDB._();
-
-  TOTPDB._() {
-    // _initializeEncryption();
-  }
-
-  static Future<void> initialize() async {
-    await instance._initializeEncryption();
-  }
-
-  Future<void> _initializeEncryption() async {
-    await _storage.initializeKeys();
-
-    final encryptionKey = await _storage.getKey();
-    final ivString = await _storage.getIV();
-
-    final key = encrypt.Key.fromBase64(encryptionKey!);
-    _iv = encrypt.IV.fromBase64(ivString!);
-    _encrypter = encrypt.Encrypter(encrypt.AES(key));
-  }
-
-  String _encryptValue(String value) {
-    return _encrypter.encrypt(value, iv: _iv).base64;
-  }
-
-  String encryptValue(String value) {
-    return _encryptValue(value);
-  }
-
-  String _decryptValue(String encrypted) {
-    return _encrypter.decrypt64(encrypted, iv: _iv);
-  }
+  factory TOTPDB() => _instance;
+  TOTPDB._internal();
 
   Future<Database> openDatabase() async {
     if (_database != null) return _database!;
@@ -60,6 +30,7 @@ class TOTPDB {
     return _database!;
   }
 
+  // didnt use yet
   Future<void> closeDatabase() async {
     await _database?.close();
     _database = null;
@@ -71,7 +42,7 @@ class TOTPDB {
 
     try {
       await store.add(db, {
-        "key": _encryptValue(key.key),
+        "key": _secure.encryptValue(key.key),
         "label": key.label,
         "issuer": key.issuer,
       });
@@ -110,24 +81,8 @@ class TOTPDB {
         );
       }).toList();
     } catch (e) {
-      print('Error loading TOTP keys: $e');
+      debugPrint('Error loading TOTP keys: $e');
       return [];
-    }
-  }
-
-  String generateTOTP(String key) {
-    try {
-      return OTP.generateTOTPCodeString(
-        _decryptValue(key),
-        DateTime.now().toUtc().millisecondsSinceEpoch,
-        interval: 30,
-        length: 6,
-        algorithm: Algorithm.SHA1,
-        isGoogle: true,
-      );
-    } catch (e) {
-      print('Error generating TOTP: $e');
-      return '------';
     }
   }
 }
