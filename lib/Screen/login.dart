@@ -19,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController controllerPassword = TextEditingController();
   String errorMessage = '';
 
-  void signIn() async {
+  Future<void> signIn() async {
     if (controllerEmail.text.isEmpty || controllerPassword.text.isEmpty) {
       setState(() {
         errorMessage = 'Please enter both email and password.';
@@ -294,7 +294,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   side: BorderSide.none,
                                 ),
                               ),
-                              onPressed: signIn,
+                              onPressed: () async {
+                                await signIn();
+                              },
                               child: Text(
                                 'Login',
                                 style: TextStyle(
