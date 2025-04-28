@@ -1,5 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:flutter/foundation.dart';
 
 class SecureStorageService {
   static const String _encryptionKeyName = 'totp_encryption_key';
@@ -97,6 +98,16 @@ class SecureStorageService {
       await _storage.write(key: _ivKeyName, value: iv);
     } catch (e) {
       throw Exception("Failed to store IV: ${e.toString()}");
+    }
+  }
+
+  Future<void> clearSecureStorage() async {
+    try {
+      await _storage.delete(key: _encryptionKeyName);
+      await _storage.delete(key: _ivKeyName);
+      debugPrint('Secure storage cleared successfully.');
+    } catch (e) {
+      debugPrint('Error clearing secure storage: $e');
     }
   }
 }

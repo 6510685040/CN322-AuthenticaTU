@@ -12,6 +12,8 @@ import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:authenticatu/database/key_db.dart';
+import 'package:authenticatu/database/secure_storage.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -25,6 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   String? _error;
   bool isGuest = false;
+  TOTPDB db = TOTPDB();
+  SecureStorageService _storage = SecureStorageService();
 
   Future<void> _checkGuestUser() async {
     final prefs = await SharedPreferences.getInstance();
@@ -37,6 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void logout() async {
     try {
       authService.value.signOut();
+      await db.clearStore();
+      await _storage.clearSecureStorage();
     } on FirebaseAuthException catch (e) {
       print(e.message);
     }

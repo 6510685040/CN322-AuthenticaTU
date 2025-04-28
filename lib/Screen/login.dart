@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:authenticatu/Screen/signup.dart';
 import 'package:authenticatu/Screen/reset_password_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:authenticatu/Screen/app_loading_page.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController controllerEmail = TextEditingController();
   TextEditingController controllerPassword = TextEditingController();
   String errorMessage = '';
+  bool isLoading = false;
 
   Future<void> signIn() async {
     if (controllerEmail.text.isEmpty || controllerPassword.text.isEmpty) {
@@ -294,9 +296,30 @@ class _LoginScreenState extends State<LoginScreen> {
                                   side: BorderSide.none,
                                 ),
                               ),
-                              onPressed: () async {
-                                await signIn();
-                              },
+                              onPressed:
+                                  isLoading
+                                      ? null
+                                      : () async {
+                                        if (!mounted)
+                                          return; // Optional extra safety
+
+                                        setState(() {
+                                          isLoading = true;
+                                        });
+
+                                        try {
+                                          await signIn();
+                                          // AuthLayout will auto-redirect
+                                        } catch (e) {
+                                          if (mounted) {
+                                            setState(() {
+                                              errorMessage = e.toString();
+                                              isLoading =
+                                                  false; // ❗ Only if login failed
+                                            });
+                                          }
+                                        }
+                                      },
                               child: Text(
                                 'Login',
                                 style: TextStyle(

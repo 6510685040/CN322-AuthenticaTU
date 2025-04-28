@@ -85,4 +85,11 @@ class TOTPDB {
       return [];
     }
   }
+
+  Future<void> clearStore() async {
+    var db = await openDatabase();
+    var store = intMapStoreFactory.store(_storeName);
+    await store.delete(db);
+    debugPrint('All TOTP keys deleted from database.');
+  }
 }
