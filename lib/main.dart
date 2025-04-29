@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
       home: const AuthLayout(), // ✅ AuthLayout will decide which screen to show
       theme: ThemeData(
         textTheme: GoogleFonts.k2dTextTheme(Theme.of(context).textTheme),
+        scaffoldBackgroundColor: const Color(0xFF0A0E21),  
       ),
     );
   }
