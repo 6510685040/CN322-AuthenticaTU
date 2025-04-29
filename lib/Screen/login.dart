@@ -1,8 +1,8 @@
 import 'package:authenticatu/Screen/auth_service.dart';
-import 'package:authenticatu/backup_management.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:authenticatu/Screen/auth_layout.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:authenticatu/backup_management.dart';
 import 'package:flutter/material.dart';
 import 'package:authenticatu/Screen/signup.dart';
 import 'package:authenticatu/Screen/reset_password_page.dart';
@@ -28,17 +28,35 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       return;
     }
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       final password = controllerPassword.text;
+
       await authService.value.signIn(
         email: controllerEmail.text,
         password: password,
       );
-      await BackupService().handleLogin(password);
+
+      if (mounted) {
+        // Navigate to loading page first - we're showing a loading indicator while backup happens
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => _BackupLoadingPage(password: password),
+          ),
+        );
+      }
     } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message ?? 'This is not working';
-      });
+      // If sign-in failed, bring the user back to login page and show error
+      if (mounted) {
+        setState(() {
+          errorMessage = e.message ?? 'Something went wrong.';
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -300,25 +318,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   isLoading
                                       ? null
                                       : () async {
-                                        if (!mounted)
-                                          return; // Optional extra safety
-
-                                        setState(() {
-                                          isLoading = true;
-                                        });
-
-                                        try {
-                                          await signIn();
-                                          // AuthLayout will auto-redirect
-                                        } catch (e) {
-                                          if (mounted) {
-                                            setState(() {
-                                              errorMessage = e.toString();
-                                              isLoading =
-                                                  false; // ❗ Only if login failed
-                                            });
-                                          }
-                                        }
+                                        await signIn();
                                       },
                               child: Text(
                                 'Login',
@@ -428,6 +428,78 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// Add this class at the bottom of login.dart
+class _BackupLoadingPage extends StatefulWidget {
+  final String password;
+
+  const _BackupLoadingPage({Key? key, required this.password})
+    : super(key: key);
+
+  @override
+  _BackupLoadingPageState createState() => _BackupLoadingPageState();
+}
+
+class _BackupLoadingPageState extends State<_BackupLoadingPage> {
+  @override
+  void initState() {
+    super.initState();
+    _performBackup();
+  }
+
+  Future<void> _performBackup() async {
+    try {
+      // Perform the backup operation
+      await BackupService().handleLogin(widget.password);
+
+      // After backup completes, navigate to AuthLayout
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const AuthLayout()),
+        );
+      }
+    } catch (e) {
+      // If there's an error, still try to navigate to AuthLayout
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Backup error: ${e.toString()}')),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const AuthLayout()),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF000957),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFEB00)),
+            ),
+            SizedBox(height: 24),
+            Text(
+              'Loading',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );
