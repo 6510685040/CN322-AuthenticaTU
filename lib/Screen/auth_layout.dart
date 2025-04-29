@@ -1,10 +1,10 @@
-import 'package:authenticatu/Screen/app_loading_page.dart';
 import 'package:authenticatu/Screen/auth_service.dart';
 import 'package:authenticatu/Screen/login.dart';
 import 'package:authenticatu/Screen/verify_email_page.dart';
 import 'package:flutter/material.dart';
 import 'package:authenticatu/Screen/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:authenticatu/Screen/app_loading_page.dart';
 
 class AuthLayout extends StatefulWidget {
   const AuthLayout({super.key});

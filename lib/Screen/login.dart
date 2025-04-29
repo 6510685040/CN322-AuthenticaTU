@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:authenticatu/Screen/signup.dart';
 import 'package:authenticatu/Screen/reset_password_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:authenticatu/Screen/app_loading_page.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
