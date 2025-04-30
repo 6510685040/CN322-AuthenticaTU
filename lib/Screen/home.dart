@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:authenticatu/Screen/auth_service.dart';
 import 'package:authenticatu/Screen/scanner.dart';
+import 'package:authenticatu/Screen/signup.dart';
 import 'package:authenticatu/components/countdownbar.dart';
 import 'package:authenticatu/providers/otp_provider.dart';
 import 'package:authenticatu/shared_pref_access.dart';
@@ -384,9 +385,10 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     children: [
       ListTile(
         leading:
-            (backUpStatus
-                ? Icon(Icons.backup, color: Colors.blue.shade400)
-                : Icon(Icons.backup)),
+        // (backUpStatus
+        //     ? Icon(Icons.backup, color: Colors.blue.shade400)
+        //     : Icon(Icons.backup)),
+        Icon(Icons.backup),
         title: const Text('Back up and Restore'),
         titleTextStyle: Theme.of(context).textTheme.displayLarge?.copyWith(
           color: Color(0xFF000957),
@@ -395,36 +397,54 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
         ),
         onTap: () async {
           try {
-            await toggleBackUpStatus();
+            final prefs = await SharedPreferences.getInstance();
+            final guest = prefs.getBool('guestUser') ?? false;
+            if (guest) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SignUpScreen()),
+              );
+            } else {
+              await toggleBackUpStatus();
+            }
             await widget.onRefresh();
-            setState(() {
-              backUpStatus = !backUpStatus;
-            });
+            // setState(() {
+            //   backUpStatus = !backUpStatus;
+            // });
             // Optionally close the drawer after refresh
             if (context.mounted) {
               Navigator.pop(context);
             }
-            if (backUpStatus) {
-              Fluttertoast.showToast(
-                msg: 'Backup operation completed successfully!',
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 3,
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-                fontSize: 16.0,
-              );
-            } else {
-              Fluttertoast.showToast(
-                msg: 'Turned off backup operation successfully!',
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 3,
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-                fontSize: 16.0,
-              );
-            }
+            Fluttertoast.showToast(
+              msg: 'Backup operation completed successfully!',
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 3,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
+            // if (backUpStatus) {
+            //   Fluttertoast.showToast(
+            //     msg: 'Backup operation completed successfully!',
+            //     toastLength: Toast.LENGTH_LONG,
+            //     gravity: ToastGravity.BOTTOM,
+            //     timeInSecForIosWeb: 3,
+            //     backgroundColor: Colors.green,
+            //     textColor: Colors.white,
+            //     fontSize: 16.0,
+            //   );
+            // } else {
+            //   Fluttertoast.showToast(
+            //     msg: 'Turned off backup operation successfully!',
+            //     toastLength: Toast.LENGTH_LONG,
+            //     gravity: ToastGravity.BOTTOM,
+            //     timeInSecForIosWeb: 3,
+            //     backgroundColor: Colors.green,
+            //     textColor: Colors.white,
+            //     fontSize: 16.0,
+            //   );
+            // }
           } catch (e) {
             Fluttertoast.showToast(
               msg: 'Backup operation failed: ${e.toString()}',

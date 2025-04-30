@@ -42,18 +42,18 @@ class OtpProvider with ChangeNotifier {
       await _db.insertData(key);
 
       //cloud
-      bool backUpBool = await getBackUpStatus();
-      if (backUpBool) {
-        try {
-          _cloudService.storeUserSecret(
-            _secure.encryptValue(key.key),
-            key.label,
-            key.issuer!,
-          );
-        } catch (e) {
-          debugPrint("Backup Error :$e");
-        }
-      }
+      // bool backUpBool = await getBackUpStatus();
+      // if (backUpBool) {
+      //   try {
+      //     _cloudService.storeUserSecret(
+      //       _secure.encryptValue(key.key),
+      //       key.label,
+      //       key.issuer!,
+      //     );
+      //   } catch (e) {
+      //     debugPrint("Backup Error :$e");
+      //   }
+      // }
       await initData();
       return true;
     } catch (e) {
